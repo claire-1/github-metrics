@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -38,6 +39,13 @@ public class GithubAccess {
         }
     }
 
+    public List<GHIssueComment> getComments(GHIssue issue) {
+        try {
+            return issue.getComments();
+        } catch (IOException e) {
+            throw new RuntimeException("GithubAccess|could not get issue comments", e);
+        }
+    }
     // TODO get all comments for an issue in a repo
     // https://github.com/github-api/github-api/blob/master/src/main/java/org/kohsuke/github/GHIssue.java#L287
     // TODO then need to classify them as closed or resolved using spam classification algorithm
