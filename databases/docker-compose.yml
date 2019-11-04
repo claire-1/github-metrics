@@ -1,0 +1,18 @@
+# TODO adapted from https://blog.logrocket.com/how-to-run-sql-server-in-a-docker-container/
+# TODO and https://stackoverflow.com/questions/43322033/create-database-on-docker-compose-startup
+version: '3.1'
+
+services:
+  
+  sql-server-db:
+    container_name: comments-sql-db
+    image: mysql:8.0.17
+    ports:
+      - "33061:3306"
+    volumes:
+      - ./mysql-dump:/docker-entrypoint-initdb.d
+    environment:
+      # SA_PASSWORD: "change_this_password"
+      # ACCEPT_EULA: "Y"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      #MYSQL_DATABASE: storage
