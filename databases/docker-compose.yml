@@ -1,5 +1,4 @@
-# TODO adapted from https://blog.logrocket.com/how-to-run-sql-server-in-a-docker-container/
-# TODO and https://stackoverflow.com/questions/43322033/create-database-on-docker-compose-startup
+# TODO adapted from https://stackoverflow.com/questions/36617682/docker-compose-mysql-import-sql 
 version: '3.1'
 
 services:

@@ -44,4 +44,11 @@ public class GithubAccessTest {
         assertEquals("another comment!", comments.get(0).getBody());
     }
 
+    public static void main(String[] args) {
+        GithubAccess github = new GithubAccess("claire-1/github-metrics");
+        List<GHIssue> issues = github.getClosedIssues();
+
+        System.out.println(issues.toString());
+    }
+
 }
