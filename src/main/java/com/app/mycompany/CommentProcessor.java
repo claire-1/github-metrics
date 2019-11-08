@@ -60,7 +60,9 @@ public class CommentProcessor {
                 putCommentInDB(issueId, issueClosedDate, comment);
             }
         } catch (SQLException e) {
-            // TODO should this be a runtime execption? this is fine for now
+            // TODO should this be a runtime execption? or should I pass the exception up to
+            // main?
+            // TODO passing main will probably be better in the long run. we'll see
             throw new RuntimeException("CommentProcessor|cannot add comment to database", e);
         }
     }
@@ -70,27 +72,11 @@ public class CommentProcessor {
         PreparedStatement preparedStmt = conn.prepareStatement(query);
         ResultSet rs = preparedStmt.executeQuery();
         String comments = "";
-        while(rs.next()){
+        while (rs.next()) {
             comments += rs.getString(3);
-         }
-        
-//         ResultSetMetaData rsmd = rs.getMetaData();
-//         System.out.println("querying SELECT * FROM XXX");
-//         int columnsNumber = rsmd.getColumnCount();
-//         String comments = "";
-//         while (rs.next()) {
-//             for (int i = 1; i <= columnsNumber; i++) {
-//                 if (i > 1) System.out.print(",  ");
-//                 String columnValue = rs.getString(i);
-//                // System.out.print(columnValue + " " + rsmd.getColumnName(i));
-//                 comments += columnValue + " " + rsmd.getColumnName(i);
-//             }
-//             comments += "~"
-// ;        }
+        }
 
-//         return comments;
-            return comments;
-
+        return comments;
     }
 
 }
