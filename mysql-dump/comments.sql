@@ -1,7 +1,7 @@
 CREATE DATABASE IF NOT EXISTS storage;
 USE storage;
 CREATE TABLE IF NOT EXISTS comments (
-    relatedIssueId int,
+    relatedIssueId bigint,
     dateIssueClosed date,
-    content char
+    content longtext
 );
