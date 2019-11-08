@@ -5,3 +5,20 @@ services:
     build: .
     # image: maven:3.3-jdk-8
     env_file: github.env
+    depends_on:
+      - sql-server-db
+
+  # TODO adapted from https://stackoverflow.com/questions/36617682/docker-compose-mysql-import-sql  
+  sql-server-db:
+    container_name: comments-sql-db
+    image: mysql:8.0.17
+    hostname: mysqlhost
+    ports:
+      - "33061:3306"
+    volumes:
+      - ./mysql-dump:/docker-entrypoint-initdb.d
+    environment:
+      # SA_PASSWORD: "change_this_password"
+      # ACCEPT_EULA: "Y"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      #MYSQL_DATABASE: storage
