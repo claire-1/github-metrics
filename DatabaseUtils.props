@@ -1,0 +1,2 @@
+jdbcDriver=org.gjt.mm.mysql.Driver
+jdbcURL=jdbc:mysql://comments-sql-db:3306/storage

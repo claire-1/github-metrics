@@ -3,5 +3,5 @@ USE storage;
 CREATE TABLE IF NOT EXISTS comments (
     relatedIssueId bigint,
     dateIssueClosed date,
-    content longtext
+    content text
 );

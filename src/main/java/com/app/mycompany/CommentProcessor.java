@@ -1,6 +1,5 @@
 package com.app.mycompany;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -13,7 +12,7 @@ import java.util.Properties;
 import org.kohsuke.github.GHIssueComment;
 
 import weka.core.Instances;
-import weka.core.converters.DatabaseLoader;
+import weka.experiment.InstanceQuery;
 
 public class CommentProcessor {
 
@@ -88,23 +87,39 @@ public class CommentProcessor {
         return comments;
     }
 
-    public Instances getAsDataSet(String query) {
-        DatabaseLoader loader;
-        String[] databaseLoaderOptions = new String[] {"-url "+connectionUrl, "-user "+userName, "-Q "+query};
+    public Instances getAsDataSet(String query2) {
+        // DatabaseLoader loader;
+        // String url = "-url jdbc:mysql://comments-sql-db:3306/storage";
+        // String user = "-user root";
+        // String testQuery = "-Q select content from comments";
+        // String[] databaseLoaderOptions = new String[] {url, user, testQuery};
+
+        // try {
+        //     loader = new DatabaseLoader();
+        //     loader.setOptions(databaseLoaderOptions);
+        // } catch (Exception e) {
+        //     throw new RuntimeException("getAsDataSet|problem connecting with database loader");
+        // }
+        
+        // loader.connectToDatabase(); // TODO need this? what does this do?
+        // try {
+        //     return loader.getDataSet();
+        // } catch (IOException e) {
+        //     throw new RuntimeException("getAsDataSet|problem connecting with database loader");
+        // } 
 
         try {
-            loader = new DatabaseLoader();
-            loader.setOptions(databaseLoaderOptions);
+            InstanceQuery query = new InstanceQuery();
+            query.setUsername("root");
+           // query.setPassword("");
+            query.setQuery("select content from comments");
+            // You can declare that your data set is sparse
+            // query.setSparseData(true);
+            Instances data = query.retrieveInstances();
+            return data;
         } catch (Exception e) {
-            throw new RuntimeException("getAsDataSet|problem connecting with database loader");
+            throw new RuntimeException("getAsDataSet|problem connecting with database loader", e);
         }
-        
-        loader.connectToDatabase(); // TODO need this? what does this do?
-        try {
-            return loader.getDataSet();
-        } catch (IOException e) {
-            throw new RuntimeException("getAsDataSet|problem connecting with database loader");
-        } 
     }
 
 }

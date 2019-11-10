@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 
+import weka.core.Instances;
+
 public class CommentProcessorTest {
 
     // Given a comment, put it in the database
@@ -31,7 +33,16 @@ public class CommentProcessorTest {
     @Test
     public void givenDatabaseShouldBeAbleToRunClassifier() {
         CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
-        processorDB.getAsDataSet(" select content from comments");
+        GithubAccess access = new GithubAccess("claire-1/github-metrics");
+        List<GHIssue> issues = access.getClosedIssues();
+        List<GHIssueComment> commentsForFirstIssue = IssueUtils.getComments(issues.get(0));
+        Date sqlDate = IssueUtils.getSqlDate(issues.get(0));
+        processorDB.putCommentsInDB(issues.get(0).getId(), sqlDate, commentsForFirstIssue);
+
+        // new
+        Instances data = processorDB.getAsDataSet(" select content from comments");
+        System.out.println("data set " + data.toString());
+        //assertEquals("", data.toString());
     }
 
 }
