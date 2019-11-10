@@ -54,13 +54,15 @@ public class GithubAccess {
         List<GHIssue> issues = github.getClosedIssues();
 
         System.out.println(issues.toString());
-        TimeUnit.SECONDS.sleep(5); // Sleep so you can see the output from the container before it finishes
 
         GHIssue currentIssue = issues.get(0);// TODO just the first issue for now
         List<GHIssueComment> comments = IssueUtils.getComments(currentIssue);
+        System.out.println("COMMENTS " + comments.size());
+        System.out.println(comments);
         CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
-        processorDB.putCommentsInDB(currentIssue.getId(),
-                IssueUtils.getSqlDate(issues.get(0)) /* TODO need to make an issue class */, comments);
+        processorDB.putCommentsInDB(currentIssue.getId(), IssueUtils.getSqlDate(issues.get(0)), comments);
+        TimeUnit.SECONDS.sleep(5); // Sleep so you can see the output from the container before it finishes
+
         // TODO need to make a way to close the connection
         // b/c
         // thread

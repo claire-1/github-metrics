@@ -1,5 +1,6 @@
 package com.app.mycompany;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -11,9 +12,14 @@ import java.util.Properties;
 
 import org.kohsuke.github.GHIssueComment;
 
+import weka.core.Instances;
+import weka.core.converters.DatabaseLoader;
+
 public class CommentProcessor {
 
     private Connection conn;
+    private String connectionUrl;
+    private String userName;
 
     public CommentProcessor(String hostnameAndPort, String databaseName) {
         // TODO source:
@@ -22,8 +28,9 @@ public class CommentProcessor {
         try {
             // String connectionUrl = "jdbc:mysql://" + hostnameAndPort + "/" +
             // databaseName;
-            String connectionUrl = "jdbc:mysql://comments-sql-db:3306/storage";
+            this.connectionUrl = "jdbc:mysql://comments-sql-db:3306/storage"; // TODO should change this to use parameters
             Properties info = new Properties();
+            this.userName = "root";
             info.put("user", "root");
             // info.put("password", "root");
 
@@ -68,6 +75,8 @@ public class CommentProcessor {
     }
 
     public String getComments() throws SQLException { // TODO this is just for testing for now
+        // Source for dealing with ResultSets:
+        // https://www.javatpoint.com/example-to-connect-to-the-mysql-database TODO
         String query = " select * from comments";
         PreparedStatement preparedStmt = conn.prepareStatement(query);
         ResultSet rs = preparedStmt.executeQuery();
@@ -77,6 +86,25 @@ public class CommentProcessor {
         }
 
         return comments;
+    }
+
+    public Instances getAsDataSet(String query) {
+        DatabaseLoader loader;
+        String[] databaseLoaderOptions = new String[] {"-url "+connectionUrl, "-user "+userName, "-Q "+query};
+
+        try {
+            loader = new DatabaseLoader();
+            loader.setOptions(databaseLoaderOptions);
+        } catch (Exception e) {
+            throw new RuntimeException("getAsDataSet|problem connecting with database loader");
+        }
+        
+        loader.connectToDatabase(); // TODO need this? what does this do?
+        try {
+            return loader.getDataSet();
+        } catch (IOException e) {
+            throw new RuntimeException("getAsDataSet|problem connecting with database loader");
+        } 
     }
 
 }

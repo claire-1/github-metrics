@@ -28,4 +28,10 @@ public class CommentProcessorTest {
         assertEquals("another comment!", processorDB.getComments());
     }
 
+    @Test
+    public void givenDatabaseShouldBeAbleToRunClassifier() {
+        CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
+        processorDB.getAsDataSet(" select content from comments");
+    }
+
 }
