@@ -33,7 +33,7 @@ public class CommentProcessorTest {
     }
 
     @Test
-    public void givenDatabaseShouldBeAbleToRunClassifier() {
+    public void givenDatabaseShouldBeAbleToRunClassifier() throws Exception {
         CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
         GithubAccess access = new GithubAccess("claire-1/github-metrics");
         List<GHIssue> issues = access.getClosedIssues();
@@ -46,6 +46,7 @@ public class CommentProcessorTest {
         System.out.println("TRAINING DATA " + trainingData.toString());
         Instances dataToBeClassified = processorDB.getAsDataSetFromSql(" select content from comments");
         System.out.println("data set " + dataToBeClassified.toString());
+        processorDB.classifyData(trainingData, dataToBeClassified);
         assertEquals("", dataToBeClassified.toString());
     }
 

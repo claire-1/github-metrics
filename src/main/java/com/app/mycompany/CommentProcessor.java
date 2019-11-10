@@ -15,6 +15,9 @@ import java.util.Properties;
 
 import org.kohsuke.github.GHIssueComment;
 
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayesMultinomial;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 import weka.experiment.InstanceQuery;
@@ -128,6 +131,7 @@ public class CommentProcessor {
             // You can declare that your data set is sparse
             // query.setSparseData(true);
             Instances data = query.retrieveInstances();
+            data.setClassIndex(data.numAttributes()-1);
             return data;
         } catch (Exception e) {
             throw new RuntimeException("getAsDataSet|problem connecting with database loader", e);
@@ -140,7 +144,7 @@ public class CommentProcessor {
         // https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes
 
         StringToWordVector filter = new StringToWordVector();
-        int classIdx = 0; // TODO explaination of class index source: https://stackoverflow.com/questions/26734189/what-is-class-index-in-weka
+        int classIdx = 1; // TODO explaination of class index source: https://stackoverflow.com/questions/26734189/what-is-class-index-in-weka
         /** the arffloader to load the arff file */
         ArffLoader loader = new ArffLoader();
         /** load the traing data */
@@ -151,7 +155,7 @@ public class CommentProcessor {
 
             Instances dataSet = loader.getDataSet();
             /** set the index based on the data given in the arff files */
-            dataSet.setClassIndex(classIdx);
+            dataSet.setClassIndex(dataSet.numAttributes()-1);/**/ 
             filter.setInputFormat(dataSet);
             dataSet = Filter.useFilter(dataSet, filter);
             return dataSet;
@@ -164,4 +168,20 @@ public class CommentProcessor {
         } // TODO maybe should just throw these to a higher level; fine for now
     }
 
+    public void classifyData(Instances trainingData, Instances dataToBeClassified) throws Exception {
+        Classifier classifier = new NaiveBayesMultinomial();
+        classifier.buildClassifier(trainingData);
+        Evaluation eval = new Evaluation(trainingData);
+       // eval.evaluateModel(classifier, dataToBeClassified);
+       // classifier.classifyInstance(dataToBeClassified.instance(i));
+        for (int i = 0; i < dataToBeClassified.numInstances(); i++) {
+			System.out.println(dataToBeClassified.instance(i));
+			double index = classifier.classifyInstance(dataToBeClassified.instance(i));
+			String className = trainingData.attribute(0).value((int) index);
+			System.out.println(className);
+            System.out.println("HELLO");
+            // TODO need to put stuff in database instead of printing here
+		}
+        
+    }
 }
