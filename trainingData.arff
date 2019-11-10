@@ -1,0 +1,7 @@
+@relation training
+
+@attribute 'content' string
+@attribute status {resolved, unresolved}
+
+@data
+'another comment', unresolved

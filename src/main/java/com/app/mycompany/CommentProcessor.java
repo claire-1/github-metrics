@@ -1,5 +1,9 @@
 package com.app.mycompany;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -12,13 +16,16 @@ import java.util.Properties;
 import org.kohsuke.github.GHIssueComment;
 
 import weka.core.Instances;
+import weka.core.converters.ArffLoader;
 import weka.experiment.InstanceQuery;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class CommentProcessor {
 
     private Connection conn;
-    private String connectionUrl;
-    private String userName;
+   // private String connectionUrl;
+    //private String userName;
 
     public CommentProcessor(String hostnameAndPort, String databaseName) {
         // TODO source:
@@ -27,9 +34,10 @@ public class CommentProcessor {
         try {
             // String connectionUrl = "jdbc:mysql://" + hostnameAndPort + "/" +
             // databaseName;
-            this.connectionUrl = "jdbc:mysql://comments-sql-db:3306/storage"; // TODO should change this to use parameters
+            String connectionUrl = "jdbc:mysql://comments-sql-db:3306/storage"; // TODO should change this to use
+                                                                              // parameters
             Properties info = new Properties();
-            this.userName = "root";
+            String userName = "root";
             info.put("user", "root");
             // info.put("password", "root");
 
@@ -81,13 +89,14 @@ public class CommentProcessor {
         ResultSet rs = preparedStmt.executeQuery();
         String comments = "";
         while (rs.next()) {
+            System.out.println("COMMENTS " + rs.getString(3));
             comments += rs.getString(3);
         }
 
         return comments;
     }
 
-    public Instances getAsDataSet(String query2) {
+    public Instances getAsDataSetFromSql(String query2) {
         // DatabaseLoader loader;
         // String url = "-url jdbc:mysql://comments-sql-db:3306/storage";
         // String user = "-user root";
@@ -95,23 +104,26 @@ public class CommentProcessor {
         // String[] databaseLoaderOptions = new String[] {url, user, testQuery};
 
         // try {
-        //     loader = new DatabaseLoader();
-        //     loader.setOptions(databaseLoaderOptions);
+        // loader = new DatabaseLoader();
+        // loader.setOptions(databaseLoaderOptions);
         // } catch (Exception e) {
-        //     throw new RuntimeException("getAsDataSet|problem connecting with database loader");
+        // throw new RuntimeException("getAsDataSet|problem connecting with database
+        // loader");
         // }
-        
+
         // loader.connectToDatabase(); // TODO need this? what does this do?
         // try {
-        //     return loader.getDataSet();
+        // return loader.getDataSet();
         // } catch (IOException e) {
-        //     throw new RuntimeException("getAsDataSet|problem connecting with database loader");
-        // } 
+        // throw new RuntimeException("getAsDataSet|problem connecting with database
+        // loader");
+        // }
 
+        // TODO source: https://waikato.github.io/weka-wiki/use_weka_in_your_java_code/
         try {
             InstanceQuery query = new InstanceQuery();
             query.setUsername("root");
-           // query.setPassword("");
+            // query.setPassword("");
             query.setQuery("select content from comments");
             // You can declare that your data set is sparse
             // query.setSparseData(true);
@@ -120,6 +132,36 @@ public class CommentProcessor {
         } catch (Exception e) {
             throw new RuntimeException("getAsDataSet|problem connecting with database loader", e);
         }
+    }
+
+    // To use for training data in arff file
+    public Instances getDataSetFromFile(String filename) {
+        // TODO Taken from source:
+        // https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes
+
+        StringToWordVector filter = new StringToWordVector();
+        int classIdx = 0; // TODO explaination of class index source: https://stackoverflow.com/questions/26734189/what-is-class-index-in-weka
+        /** the arffloader to load the arff file */
+        ArffLoader loader = new ArffLoader();
+        /** load the traing data */
+        try {
+            File initialFile = new File("trainingData.arff");
+            InputStream targetStream = new FileInputStream(initialFile);
+            loader.setSource(targetStream);
+
+            Instances dataSet = loader.getDataSet();
+            /** set the index based on the data given in the arff files */
+            dataSet.setClassIndex(classIdx);
+            filter.setInputFormat(dataSet);
+            dataSet = Filter.useFilter(dataSet, filter);
+            return dataSet;
+        } catch (IOException e) {
+            throw new RuntimeException("getDataSetFromFile|can't access file", e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("getDataSetFromFile|can't set class index", e);
+        } catch (Exception e) {
+            throw new RuntimeException("getDataSetFromFile|can't set input format", e);
+        } // TODO maybe should just throw these to a higher level; fine for now
     }
 
 }

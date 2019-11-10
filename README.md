@@ -15,3 +15,4 @@ Java Github API: https://github.com/github-api
 About how to get a Github OAuth token: https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
 About how to specify Github OAuth token as an environment variable: https://issues.jenkins-ci.org/browse/JENKINS-37581
 About how to execute Java with maven: https://stackoverflow.com/questions/18011494/failed-to-execute-goal-org-codehaus-mojoexec-maven-plugin1-2java-default-cli
+Example arff file for training data http://users.eecs.northwestern.edu/~ahu340/eecs349-ps1/train.arff 

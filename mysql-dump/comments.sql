@@ -5,3 +5,9 @@ CREATE TABLE IF NOT EXISTS comments (
     dateIssueClosed date,
     content text
 );
+
+CREATE TABLE IF NOT EXISTS classifierResults (
+    relatedIssueId bigint,
+    dateIssueClosed date,
+    classifiedIssueStatus text
+);
