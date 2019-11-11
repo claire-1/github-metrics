@@ -2,13 +2,14 @@ package com.app.mycompany;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+
+import weka.core.Instances;
 
 /**
  * GithubAccess: Gets info from github
@@ -48,20 +49,33 @@ public class GithubAccess {
     // TODO then need to classify them as closed or resolved using spam
     // classification algorithm
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         System.out.println("HELLLOOOOOOO");
         GithubAccess github = new GithubAccess("claire-1/github-metrics");
         List<GHIssue> issues = github.getClosedIssues();
 
-        System.out.println(issues.toString());
+       // System.out.println(issues.toString());
+       System.out.println("NUMBER OF ISSUES " + issues.size());
 
+        // Put the comments in the database
         GHIssue currentIssue = issues.get(0);// TODO just the first issue for now
         List<GHIssueComment> comments = IssueUtils.getComments(currentIssue);
         System.out.println("COMMENTS " + comments.size());
         System.out.println(comments);
-        CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
+        CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306", "storage", "root");
         processorDB.putCommentsInDB(currentIssue.getId(), IssueUtils.getSqlDate(issues.get(0)), comments);
-        TimeUnit.SECONDS.sleep(5); // Sleep so you can see the output from the container before it finishes
+        //TimeUnit.SECONDS.sleep(5); // Sleep so you can see the output from the container before it finishes
+        
+        // Process data to get classification
+        Instances trainingData = processorDB.getDataSetFromFile("trainingData.arff");
+        System.out.println("TRAINING DATA " + trainingData.toString());
+        Instances dataToBeClassified = processorDB.getAsDataSetFromSql(" select content from comments");
+        System.out.println("data set " + dataToBeClassified.toString());
+        String classification = processorDB.classifyData(trainingData, dataToBeClassified);
+        
+        // Put in database --> TODO should really be own test but the issue with adding to the database in different tests
+        processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(issues.get(0)), classification);
+ 
 
         // TODO need to make a way to close the connection
         // b/c

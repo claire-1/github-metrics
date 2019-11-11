@@ -19,8 +19,7 @@ public class CommentProcessorTest {
     public void givenDatabaseConnectionShouldConnectWithoutErrors() throws SQLException {
         // TODO not the greatest test either b/c really should mock/assume connection
         // works so don't need to test it in the end
-        // TODO need to connect to dockerized database!!!!! (see docker-compose.yml)
-        CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
+        CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306", "storage","root");
         GithubAccess access = new GithubAccess("claire-1/github-metrics");
         List<GHIssue> issues = access.getClosedIssues();
         List<GHIssueComment> commentsForFirstIssue = IssueUtils.getComments(issues.get(0));
@@ -34,7 +33,7 @@ public class CommentProcessorTest {
 
     @Test
     public void givenDatabaseShouldBeAbleToRunClassifier() throws Exception {
-        CommentProcessor processorDB = new CommentProcessor("mysqlhost:3306", "storage");
+        CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306", "storage", "root");
         GithubAccess access = new GithubAccess("claire-1/github-metrics");
         List<GHIssue> issues = access.getClosedIssues();
         GHIssue secondIssue = issues.get(issues.size()-2);
