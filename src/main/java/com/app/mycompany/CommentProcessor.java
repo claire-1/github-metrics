@@ -51,7 +51,7 @@ public class CommentProcessor {
         }
     }
 
-    public void putCommentInDB(long issueId, Date timestamp, GHIssueComment comment) throws SQLException {
+    public void putCommentInDB(long issueId, Date issueClosedDate, GHIssueComment comment) throws SQLException {
         // the mysql insert statement
         String query = " insert into comments (relatedIssueId, dateIssueClosed, content)" + " values (?, ?, ?)";
 
@@ -61,7 +61,7 @@ public class CommentProcessor {
         // try {
         PreparedStatement preparedStmt = conn.prepareStatement(query);
         preparedStmt.setLong(1, issueId);
-        preparedStmt.setDate(2, timestamp);
+        preparedStmt.setDate(2, issueClosedDate);
         preparedStmt.setString(3, comment.getBody());
         // execute the query
         preparedStmt.execute();
@@ -84,10 +84,9 @@ public class CommentProcessor {
         }
     }
 
-    public String getComments() throws SQLException { // TODO this is just for testing for now
+    public String getDataFromDatabase(String query) throws SQLException { // TODO this is just for testing for now
         // Source for dealing with ResultSets:
         // https://www.javatpoint.com/example-to-connect-to-the-mysql-database TODO
-        String query = " select * from comments";
         PreparedStatement preparedStmt = conn.prepareStatement(query);
         ResultSet rs = preparedStmt.executeQuery();
         String comments = "";
@@ -168,20 +167,41 @@ public class CommentProcessor {
         } // TODO maybe should just throw these to a higher level; fine for now
     }
 
-    public void classifyData(Instances trainingData, Instances dataToBeClassified) throws Exception {
+    public String classifyData(Instances trainingData, Instances dataToBeClassified) throws Exception {
         Classifier classifier = new NaiveBayesMultinomial();
         classifier.buildClassifier(trainingData);
         Evaluation eval = new Evaluation(trainingData);
        // eval.evaluateModel(classifier, dataToBeClassified);
        // classifier.classifyInstance(dataToBeClassified.instance(i));
-        for (int i = 0; i < dataToBeClassified.numInstances(); i++) {
+        //for (int i = 0; i < dataToBeClassified.numInstances(); i++) {
+            int i = 0;
 			System.out.println(dataToBeClassified.instance(i));
 			double index = classifier.classifyInstance(dataToBeClassified.instance(i));
-			String className = trainingData.attribute(0).value((int) index);
-			System.out.println(className);
+			String classification = trainingData.attribute(0).value((int) index);
+			System.out.println(classification);
             System.out.println("HELLO");
+            return classification;
             // TODO need to put stuff in database instead of printing here
-		}
+		//}
         
+    }
+
+    public void putClassificationInDB(long issueId, Date issueClosedDate, String classification) throws SQLException {
+        // the mysql insert statement
+        String query = " insert into classifierResults (relatedIssueId, dateIssueClosed, classifiedIssueStatus)" + " values (?, ?, ?)";
+
+        // create the mysql insert preparedstatement
+        // Source TODO
+        // https://alvinalexander.com/java/java-mysql-insert-example-preparedstatement
+        // try {
+        PreparedStatement preparedStmt = conn.prepareStatement(query);
+        preparedStmt.setLong(1, issueId);
+        preparedStmt.setDate(2, issueClosedDate);
+        preparedStmt.setString(3, classification);
+        // execute the query
+        preparedStmt.execute();
+        // } catch (SQLException e) {
+        // throw new SQLException("CommentProcessor|cannot add comment to database", e);
+        // }
     }
 }

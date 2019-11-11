@@ -28,8 +28,8 @@ public class GithubAccessTest {
         GithubAccess github = new GithubAccess("claire-1/github-metrics");
         List<GHIssue> issues = github.getClosedIssues();
 
-        assertEquals(1, issues.size());
-        assertEquals("Here is my comment", issues.get(0).getBody());
+        assertEquals(2, issues.size());
+        assertEquals("Here is my comment", issues.get(issues.size()-1).getBody());
     }
 
     @Test
@@ -39,7 +39,7 @@ public class GithubAccessTest {
         // TODO will this still work if I add more issues with more comments?
         // TODO should this be mocked? no b/c need to test actual API connection?
         // TODO do I need to test that?
-        List<GHIssueComment> comments = IssueUtils.getComments(issues.get(0));
+        List<GHIssueComment> comments = IssueUtils.getComments(issues.get(issues.size()-1));
 
         assertEquals("another comment!", comments.get(0).getBody());
     }
