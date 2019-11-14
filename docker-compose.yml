@@ -4,6 +4,9 @@ services:
   metrics:
     build: .
     # image: maven:3.3-jdk-8
+    hostname: clairesmetricshostname
+    ports:
+      - "8080:8080"
     env_file: github.env
     depends_on:
       - sql-server-db
@@ -12,7 +15,7 @@ services:
   sql-server-db:
     container_name: comments-sql-db
     image: mysql:8.0.17
-    hostname: mysqlhost
+    # hostname: mysqlhost
     ports:
       - "33061:3306"
     volumes:
