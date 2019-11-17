@@ -23,5 +23,6 @@ services:
     environment:
       # SA_PASSWORD: "change_this_password"
       # ACCEPT_EULA: "Y"
-      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      #MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       #MYSQL_DATABASE: storage
+      MYSQL_ROOT_PASSWORD: "root"

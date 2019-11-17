@@ -38,6 +38,7 @@ public class CommentProcessor {
             String connectionUrl = "jdbc:mysql://" + hostnameAndPort + "/" + databaseName;
             Properties info = new Properties();
             info.put("user", userName);
+            info.put("password", "root"); // TODO make this a parameter if works with PHP
 
             conn = DriverManager.getConnection(connectionUrl, info);
         } catch (SQLException e) {
@@ -84,6 +85,7 @@ public class CommentProcessor {
         try {
             InstanceQuery query = new InstanceQuery();
             query.setUsername("root");
+            query.setPassword("root");
             query.setQuery("select content from comments");
             // query.setSparseData(true); // doesn't store info that is zero. TODO want
             // this?
