@@ -1,178 +1,187 @@
-<!--TODO Source donwloaded file D3-Tips-and-Tricks-3902-extras/d3jscodesamples/13/simple-graph.html
-from http://www.d3noob.org/2013/02/using-mysql-database-as-source-of-data.html -->
+<!-- TODO source: https://www.d3-graph-gallery.com/graph/barplot_animation_start.html -->
+
+<!-- TODO new source: http://bl.ocks.org/d3noob/8952219 -->
+<!-- Code from d3-graph-gallery.com -->
 
 <!DOCTYPE html>
 <meta charset="utf-8">
 
-<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+<head>
+    <style>
+        .axis {
+            font: 10px sans-serif;
+        }
 
-<style>
-    /* set the CSS */
-
-    body {
-        font: 12px Arial;
-    }
-
-    path {
-        stroke: steelblue;
-        stroke-width: 2;
-        fill: none;
-    }
-
-    .axis path,
-    .axis line {
-        fill: none;
-        stroke: grey;
-        stroke-width: 1;
-        shape-rendering: crispEdges;
-    }
-</style>
-
-
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+    </style>
+</head>
 
 <body>
 
-    <!-- load the d3.js library -->
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script src="http://d3js.org/d3.v3.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
 
     <script>
 
-        // Set the dimensions of the canvas / graph
-        var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+        var margin = { top: 20, right: 20, bottom: 70, left: 40 },
             width = 600 - margin.left - margin.right,
-            height = 270 - margin.top - margin.bottom;
+            height = 300 - margin.top - margin.bottom;
 
         // Parse the date / time
-        //var parseDate = d3.time.format("%d-%b-%y").parse;
+        var parseDate = d3.time.format("%Y-%m").parse;
 
-        // Set the ranges
-        var x = d3.time.scale().range([0, width]);
+        var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
         var y = d3.scale.linear().range([height, 0]);
 
-        // Define the axes
-        var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(5);
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickFormat(d3.time.format("%Y-%m"));
 
-        var yAxis = d3.svg.axis().scale(y)
-            .orient("left").ticks(5);
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .ticks(10);
 
-        // Define the line
-        var valueline = d3.svg.line()
-            .x(function (d) { return x(d.relatedIssueId); })
-            .y(function (d) { return y(d.dateIssueClosed); });
-        // TODO need to add classifiedIssueStatus here
-
-        // Adds the svg canvas
-        var svg = d3.select("body")
-            .append("svg")
+        var svg = d3.select("body").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
 
-        // Get the data
-        console.error("Time to get DATA");
-        var loc = window.location.pathname;
-        console.error("Time to get DATA " + loc);
-        // var w = window.open('php/getDataFromSql.php'); //Required full file path.
-        // w.print();
+        d3.json("php/delete.json", function (error, data) {
 
-        // var neededData;
-        // $.getJSON('php/getDataFromSql.php', function (jsonData) {
-        //     neededData = jsonData;
-        // });
-        // d3.json('php/getDataFromSql.php', function (error, data) {
-        //     console.error("This is data " + data);
-        //     console.error("THIS IS ERROR " + error);
-        //     data.forEach(function (d) {
-        //         //  d.dateIssueClosed = parseDate(d.dateIssueClosed);
-        //         d.dateIssueClosed = +d.dateIssueClosed;
-        //         d.relatedIssueId = +d.relatedIssueId;
-        //     });
-
-        // TODO source that was helpful for sample json file https://stackoverflow.com/questions/38104612/using-json-file-in-html-uncaught-typeerror-data-foreach-is-not-a-function 
-        d3.json('php/delete.json', function (error, data) {
-            console.error("This is data " + data);
-            console.error("THIS IS ERROR " + error);
-            data.commentsArray.forEach(function (d) {
-                //  d.dateIssueClosed = parseDate(d.dateIssueClosed);
-                d.dateIssueClosed = +d.dateIssueClosed;
-                d.relatedIssueId = +d.relatedIssueId;
+            data.issuesArray.forEach(function (d) {
+                d.date = parseDate(d.date);
+                d.value = +d.value;
             });
 
+            x.domain(data.issuesArray.map(function (d) { return d.date; }));
+            y.domain([0, d3.max(data.issuesArray, function (d) { return d.value; })]);
 
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function (d) { return d.dateIssueClosed; }));
-            y.domain([0, d3.max(data, function (d) { return d.relatedIssueId; })]);
-
-            // Add the valueline path.
-            svg.append("path")
-                .attr("class", "line")
-                .attr("d", valueline(data));
-
-            // Add the X Axis
             svg.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
+                .call(xAxis)
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", "-.55em")
+                .attr("transform", "rotate(-90)");
 
-            // Add the Y Axis
             svg.append("g")
                 .attr("class", "y axis")
-                .call(yAxis);
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Value ($)");
+
+            // data.issuesArray.forEach??
+            svg.selectAll("bar")
+                .data(data.issuesArray)
+                .enter().append("rect")
+                .style("fill", "steelblue")
+                .attr("x", function (d) {
+                    return x(d.date);
+                })
+                .attr("width", x.rangeBand())
+                .attr("y", function (d) {
+                    return y(d.value);
+                })
+                .attr("height", function (d) {
+                    return height - y(d.value);
+                });
 
         });
 
     </script>
-    <h1>Yay!!!!</h1>
+
 </body>
 
-</html>
+
+
+
+
+
 
 <!-- <!DOCTYPE html>
 <meta charset="utf-8">
 
+
 <script src="https://d3js.org/d3.v4.js"></script>
+
+
+<div id="my_dataviz"></div>
+
 
 <script>
 
-    function triggerTransition() {
-        d3.select("#rectAreaOther")
-            .transition()
-            .delay(100)
-            .duration(2000)
-            .attr("width", "315")
 
-        d3.select("#rectAreaWomen")
-            .transition()
-            .delay(100)
-            .duration(2000)
-            .attr("width", "185")
-    }
+    // set the dimensions and margins of the graph
+    var margin = { top: 10, right: 30, bottom: 90, left: 40 },
+        width = 460 - margin.left - margin.right,
+        height = 450 - margin.top - margin.bottom;
 
-</script>
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
 
+    // Parse the Data
+    d3.json("delete.json", function (data) {
 
-<button onclick="triggerTransition()">Trigger transition</button>
+        // X axis
+        var x = d3.scaleBand()
+            .range([0, width])
+            .domain(data.map(function (d) { return d.relatedIssueId; }))
+            .padding(0.2);
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
 
+        // Add Y axis
+        var y = d3.scaleLinear()
+            .domain([0, 13000])
+            .range([height, 0]);
+        svg.append("g")
+            .call(d3.axisLeft(y));
 
-<div>
-    <svg width="960px" height="400px">
-        <text x="10" y="190" font-family="Verdana" font-size="16" fill="black">Men 63%</text>
-        <rect id="rectAreaOther" x="10" y="200" width="200" height="30" stroke="black" fill="#69b3a2"
-            stroke-width="1" />
-        <text x="300" y="190" font-family="Verdana" font-size="16" fill="black">Women 37%</text>
-        <rect id="rectAreaWomen" x="300" y="200" width="200" height="30" stroke="black" fill="#C0C0C0"
-            stroke-width="1" />
+        // Bars
+        svg.selectAll("mybar")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", function (d) { return x(d.relatedIssueId); })
+            .attr("width", x.bandwidth())
+            .attr("fill", "#69b3a2")
+            // no bar at the beginning thus:
+            .attr("height", function (d) { return height - y(0); }) // always equal to 0
+            .attr("y", function (d) { return y(0); })
 
-    </svg>
-    <svg width="960px" height="400px">
-        <rect id="rectAreaOther" x="40" y="200" width="200" height="30" stroke="black" fill="#C0C0C0"
-            stroke-width="1" />
-    </svg>
-</div>
+        // Animation
+        // svg.selectAll("rect")
+        //     .transition()
+        //     .duration(800)
+        //     .attr("y", function (d) { return y(d.Value); })
+        //     .attr("height", function (d) { return height - y(d.Value); })
+        //     .delay(function (d, i) { console.log(i); return (i * 100) })
 
-</html> -->
+    })
+
+</script> -->
