@@ -1,9 +1,14 @@
 package com.app.mycompany;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHIssueState;
@@ -55,72 +60,64 @@ public class GithubAccess {
     // classification algorithm
 
     public static void main(String[] args) throws Exception {
-        System.out.println("HELLLOOOOOOO");
         GithubAccess github = new GithubAccess("claire-1/github-metrics");
-        // TODO change this back for issue with only getting some of the issues from github but not all if there are a lot
-        // TODO this is the thing to change GithubAccess github = new GithubAccess("tootsuite/mastodon");
+        CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306", "storage", "root");
+        // TODO change this back for issue with only getting some of the issues from
+        // github but not all if there are a lot
+        // TODO this is the thing to change GithubAccess github = new
+        // GithubAccess("tootsuite/mastodon");
         List<GHIssue> issues = github.getClosedIssues();
+         // Process data to get classification
+         Instances trainingData = processorDB.getDataSetFromFile("trainingData.arff");
+         System.out.println("TRAINING DATA " + trainingData.toString());
 
         // System.out.println(issues.toString());
         System.out.println("NUMBER OF ISSUES " + issues.size());
 
         // Put the comments in the database
-        GHIssue currentIssue = issues.get(issues.size() - 1);// TODO just the first issue for now
-        List<GHIssueComment> comments = IssueUtils.getComments(currentIssue);
-        System.out.println("COMMENTS " + comments.size());
-        System.out.println(comments);
-        CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306", "storage", "root");
-        processorDB.putCommentsInDB(currentIssue.getId(), IssueUtils.getSqlDate(issues.get(0)), comments);
-        // TimeUnit.SECONDS.sleep(5); // Sleep so you can see the output from the
-        // container before it finishes
+        
+        for (int i = 0; i < issues.size(); i++) {
+            GHIssue currentIssue = issues.get(i);// TODO just the oldest issue for now
+            List<GHIssueComment> currentIssueComments = IssueUtils.getComments(currentIssue);
+            System.out.println("COMMENTS " + currentIssueComments.size());
+            System.out.println(currentIssueComments);
+            processorDB.putCommentsInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), currentIssueComments);
 
-        // Process data to get classification
-        Instances trainingData = processorDB.getDataSetFromFile("trainingData.arff");
-        System.out.println("TRAINING DATA " + trainingData.toString());
-        Instances dataToBeClassified = processorDB.getAsDataSetFromSql(" select content from comments");
-        System.out.println("data set " + dataToBeClassified.toString());
-        String classification = processorDB.classifyData(trainingData, dataToBeClassified);
+            Instances dataToBeClassified = processorDB.getAsDataSetFromSql(" select content from comments");
+            System.out.println("data set " + dataToBeClassified.toString());
+            String classification = processorDB.classifyData(trainingData, dataToBeClassified);
+            System.out.println("classification " + classification);
+    
+            // Put in database --> TODO should really be own test but the issue with adding
+            // to the database in different tests
+            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), classification);
+            processorDB.manipulateData(" delete from comments"); // execute a query to clear the database of comments so can be empty for next issue's comments
+        }  
 
-        // Put in database --> TODO should really be own test but the issue with adding
-        // to the database in different tests
-        processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(issues.get(0)), classification);
+        // TODO source for query: https://stackoverflow.com/questions/14565788/how-to-group-by-month-from-date-field-using-sql
+        // TODO source for query: https://stackoverflow.com/questions/53848520/group-by-several-columns-with-count-on-another-column-sql-server
+        // TODO source for query: https://www.w3schools.com/sql/trymysql.asp?filename=trysql_func_mysql_date_format
+        ResultSet rsFromDB = processorDB
+                .getDataFromDatabaseAsResultSet(
+                    " select DATE_FORMAT(dateIssueClosed, '%Y-%m') AS dateIssueClosed, SUM(CASE WHEN classifiedIssueStatus=\'unresolved\' THEN 1 ELSE 0 END) as numberIssuesUnresolved, SUM(CASE WHEN classifiedIssueStatus=\'resolved\' THEN 1 ELSE 0 END) as numberIssuesResolved from classifierResults GROUP BY DATE_FORMAT(dateIssueClosed, '%Y-%m') ORDER BY dateIssueClosed");
+        System.out.println("RESULT SET " + rsFromDB.toString()); 
+        
+        JSONArray jsonOfDB = CommentProcessor.convertToJSON(rsFromDB);
+        System.out.println("JSON " + jsonOfDB.toString());
 
-        // File webPage = new File("simple-graph.html");
-        // try {
-        //     Desktop.getDesktop.browse(webPage.toURI());
-        // } catch (IOException e) {
-        //     // TODO
-        // }
+        String filePath = System.getProperty("user.dir") + "/display/php/classifications.json";
+        System.out.println("FILE PATH " + filePath);
+        File classificationToDisplayFile = new File(filePath);
+        // TODO source for FileWriter https://www.journaldev.com/878/java-write-to-file
+        FileWriter writer = new FileWriter(classificationToDisplayFile);
+        //jsonOfDB.writeJSONString(jsonOfDB, classificationToDisplayFile);
+        JSONObject wrapJsonOfDB = new JSONObject();
+        wrapJsonOfDB.put("issuesArray", jsonOfDB);
+        writer.write(wrapJsonOfDB.toString());
+        writer.close();
 
-    // JFrame myFrame = new JFrame();
-    //     try
-	// {
-	// String html;
-	// html="<html><head><title>Simple Page</title></head>";
-	// html+="<body bgcolor='#777779'><hr/><font size=50>This is Html content</font><hr/>";
-	// html+="</body></html>";
-	// JEditorPane ed1=new JEditorPane("text/html",html);
-	// myFrame.add(ed1);
-	// myFrame.setVisible(true);
-	// myFrame.setSize(600,600);
-	// myFrame.setDefaultCloseOperation(0);
-	// }
-	// catch(Exception e)
-	// {
-	// 	e.printStackTrace();
-	// 	System.out.println("Some problem has occured"+e.getMessage());
-	// }
-
-    // System.out.println("Should be displaying the webpage at clairesmetricshostname:80");
-    // TimeUnit.SECONDS.sleep(120); // Sleep so you can see the output from the
-
-
-
-// TODO source for Java to HTML ^^^^ Read more: http://mrbool.com/display-html-contents-with-java/24532#ixzz65HkdI7bf
-
-
-
-
+        // TODO write JSON to a file
+    
         // TODO need to make a way to close the connection
         // b/c
         // thread

@@ -13,6 +13,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.kohsuke.github.GHIssueComment;
 
 import weka.classifiers.Classifier;
@@ -66,18 +69,48 @@ public class CommentProcessor {
         }
     }
 
+    // TODO delete this probably
     public String getDataFromDatabase(String query) throws SQLException { // TODO this is just for testing for now
+        // Source for dealing with ResultSets:
+        // https://www.javatpoint.com/example-to-connect-to-the-mysql-database TODO
+        System.out.println("getting data");
+        PreparedStatement preparedStmt = conn.prepareStatement(query);
+        ResultSet rs = preparedStmt.executeQuery();
+        String dataString = "";
+        while (rs.next()) {
+            System.out.println("COMMENTS " + rs.getString(1));
+            // for (int i = 0; i < rs.getFetchSize(); i++) {
+            // dataString += rs.getString(i);
+            // }
+            dataString += rs.getString(1);
+            // comments += rs.getString(2);
+        }
+
+        return dataString;
+    }
+
+    // TODO source
+    // http://biercoff.com/nice-and-simple-converter-of-java-resultset-into-jsonarray-or-xml/
+    public static JSONArray convertToJSON(ResultSet resultSet) throws JSONException, SQLException {
+        JSONArray jsonArray = new JSONArray();
+        while (resultSet.next()) {
+            int total_rows = resultSet.getMetaData().getColumnCount();
+            JSONObject obj = new JSONObject();
+            for (int i = 0; i < total_rows; i++) {
+                obj.put(resultSet.getMetaData().getColumnLabel(i + 1), 
+                    resultSet.getObject(i + 1));   
+            }
+            jsonArray.put(obj);
+        }
+        return jsonArray;
+    }
+
+    public ResultSet getDataFromDatabaseAsResultSet(String query) throws SQLException { // TODO this is just for testing for now
         // Source for dealing with ResultSets:
         // https://www.javatpoint.com/example-to-connect-to-the-mysql-database TODO
         PreparedStatement preparedStmt = conn.prepareStatement(query);
         ResultSet rs = preparedStmt.executeQuery();
-        String comments = "";
-        while (rs.next()) {
-            System.out.println("COMMENTS " + rs.getString(3));
-            comments += rs.getString(3);
-        }
-
-        return comments;
+        return rs;
     }
 
     public Instances getAsDataSetFromSql(String query2) {
@@ -141,6 +174,10 @@ public class CommentProcessor {
         return classification;
     }
 
+    public void manipulateData(String query) throws SQLException {
+        PreparedStatement preparedStatement = conn.prepareStatement(query);
+        preparedStatement.execute();
+    }
     public void putClassificationInDB(long issueId, Date issueClosedDate, String classification) throws SQLException {
         String query = " insert into classifierResults (relatedIssueId, dateIssueClosed, classifiedIssueStatus)"
                 + " values (?, ?, ?)";

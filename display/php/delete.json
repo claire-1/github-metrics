@@ -1,30 +1,30 @@
 {
     "issuesArray": [
         {
-            "date": "2013-01",
-            "value": 20,
+            "dateIssueClosed": "2013-01",
+            "numberIssuesClosed": 20,
             "numberIssuesResolved": 4,
-            "relatedIssueIds": [
+            "relatedClosedIssueIds": [
                 1000,
                 3000,
                 90
             ]
         },
         {
-            "date": "2013-03",
-            "value": 10,
+            "dateIssueClosed": "2013-03",
+            "numberIssuesClosed": 10,
             "numberIssuesResolved": 4,
-            "relatedIssueIds": [
+            "relatedClosedIssueIds": [
                 1000,
                 3000,
                 90
             ]
         },
         {
-            "date": "2013-02",
-            "value": 40,
+            "dateIssueClosed": "2013-02",
+            "numberIssuesClosed": 40,
             "numberIssuesResolved": 4,
-            "relatedIssueIds": [
+            "relatedClosedIssueIds": [
                 1000,
                 3000,
                 90
