@@ -66,8 +66,8 @@
             });
 
             x.domain(data.issuesArray.map(function (d) { return d.dateIssueClosed; }));
-            y.domain([0, d3.max(data.issuesArray, function (d) { return d3.max(d.numberIssuesUnresolved, d.numberIssuesResolved); })]);
-
+            y.domain([0, d3.max(data.issuesArray, function (d) { if (d.numberIssuesUnresolved > d.numberIssuesResolved) { return d.numberIssuesUnresolved; } else { return d.numberIssuesResolved; } })]);
+            //d3.max(d.numberIssuesUnresolved, d.numberIssuesResolved)
             svg.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
@@ -86,7 +86,9 @@
                 .attr("y", 6)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
-                .text("Value ($)");
+                .text("Value");
+
+
 
             // data.issuesArray.forEach??
             svg.selectAll("bar")
@@ -98,11 +100,26 @@
                 })
                 .attr("width", x.rangeBand())
                 .attr("y", function (d) {
+                    return y(d.numberIssuesResolved);
+                })
+                .attr("height", function (d) {
+                    return height - y(d.numberIssuesResolved);
+                });
+
+            svg.selectAll("bar")
+                .data(data.issuesArray)
+                .enter().append("rect")
+                .style("fill", "red")
+                .attr("x", function (d) {
+                    return x(d.dateIssueClosed);
+                })
+                .attr("width", x.rangeBand())
+                .attr("y", function (d) {
                     return y(d.numberIssuesUnresolved);
                 })
                 .attr("height", function (d) {
                     return height - y(d.numberIssuesUnresolved);
-                })
+                });
             // svg.selectAll("bar")
             //     .data(data.issuesArray)
             //     .enter().append("rect")

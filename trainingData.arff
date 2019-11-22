@@ -6,3 +6,4 @@
 @data
 'another comment', unresolved
 'I found the problem and made a new pull request to fix it! Closing this issue now', resolved
+'I am closing this issue but it is not fixed', unresolved
