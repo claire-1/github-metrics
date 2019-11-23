@@ -4,6 +4,47 @@
 @attribute status {resolved, unresolved}
 
 @data
-'another comment', unresolved
+'not', unresolved
+'fix', unresolved
+'fixed', resolved
+'instructions', resolved
+'issue', unresolved
+'?', unresolved
+'finished', resolved
+'another', resolved
+'not', unresolved
+'fix', unresolved
+'fixed', resolved
+'instructions', resolved
+'issue', unresolved
+'?', unresolved
+'finished', resolved
+'another', resolved
+'not', unresolved
+'fix', unresolved
+'fixed', resolved
+'instructions', resolved
+'issue', unresolved
+'?', unresolved
+'finished', resolved
+'another', resolved
+'not', unresolved
+'fix', unresolved
+'fixed', resolved
+'instructions', resolved
+'issue', unresolved
+'?', unresolved
+'finished', resolved
+'another', resolved
 'I found the problem and made a new pull request to fix it! Closing this issue now', resolved
 'I am closing this issue but it is not fixed', unresolved
+'super cool closing this issue', resolved
+'another comment', unresolved
+'I found the problem and made a new pull request to fix it! Closing this issue now', resolved
+
+
+
+
+
+
+

@@ -5,6 +5,7 @@
 
 <!-- TODO NEED TO FIGURE OUT HOW TO GRAPH EACH ISSUE (probably want to include link to issue)-->
 
+<!-- TODO newest source: https://stackoverflow.com/questions/39169948/grouped-bar-chart-from-json-data-instead-of-csv-->
 <!DOCTYPE html>
 <meta charset="utf-8">
 
@@ -37,8 +38,12 @@
         var parseDate = d3.time.format("%Y-%m").parse;
 
         var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+        var x1 = d3.scale.ordinal(); // TODO new
 
         var y = d3.scale.linear().range([height, 0]);
+        var color = d3.scale.ordinal()
+            .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
 
         var xAxis = d3.svg.axis()
             .scale(x)
@@ -57,26 +62,33 @@
             .attr("transform",
                 "translate(" + margin.left + "," + margin.top + ")");
 
+
         d3.json("php/classifications.json", function (error, data) {
+            var statusNames = d3.keys(data.issuesArray[0]).filter(function (key) { return key !== "dateIssueClosed"; });
 
             data.issuesArray.forEach(function (d) {
+                d.statuses = statusNames.map(function (name) { return { name: name, value: +d[name] }; });
                 d.dateIssueClosed = parseDate(d.dateIssueClosed);
                 d.numberIssuesUnresolved = +d.numberIssuesUnresolved;
                 d.numberIssuesResolved = +d.numberIssuesResolved;
             });
 
+
+            //         data.forEach(function(d) {
+            // d.ages = ageNames.map(function(name) { return {name: name, value: +d[name]}; });
+            // });
+
+            // var status = d3.keys(data[0]).filter(function (key) { return key !== "dateIssueClosed"; });
             x.domain(data.issuesArray.map(function (d) { return d.dateIssueClosed; }));
-            y.domain([0, d3.max(data.issuesArray, function (d) { if (d.numberIssuesUnresolved > d.numberIssuesResolved) { return d.numberIssuesUnresolved; } else { return d.numberIssuesResolved; } })]);
+            x1.domain(statusNames).rangeRoundBands([0, x.rangeBand()]);
+            y.domain([0, d3.max(data.issuesArray, function (d) { return d3.max(d.statuses, function (d) { return d.value; }); })]);
+            // y.domain([0, d3.max(data.issuesArray, function (d) { if (d.numberIssuesUnresolved > d.numberIssuesResolved) { return d.numberIssuesUnresolved; } else { return d.numberIssuesResolved; } })]);
             //d3.max(d.numberIssuesUnresolved, d.numberIssuesResolved)
+
             svg.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + height + ")")
-                .call(xAxis)
-                .selectAll("text")
-                .style("text-anchor", "end")
-                .attr("dx", "-.8em")
-                .attr("dy", "-.55em")
-                .attr("transform", "rotate(-90)");
+                .call(xAxis);
 
             svg.append("g")
                 .attr("class", "y axis")
@@ -86,136 +98,44 @@
                 .attr("y", 6)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
-                .text("Value");
+                .text("Number of Each Closed Type");
 
-
-
-            // data.issuesArray.forEach??
-            svg.selectAll("bar")
+            var state = svg.selectAll(".state")
                 .data(data.issuesArray)
-                .enter().append("rect")
-                .style("fill", "steelblue")
-                .attr("x", function (d) {
-                    return x(d.dateIssueClosed);
-                })
-                .attr("width", x.rangeBand())
-                .attr("y", function (d) {
-                    return y(d.numberIssuesResolved);
-                })
-                .attr("height", function (d) {
-                    return height - y(d.numberIssuesResolved);
-                });
+                .enter().append("g")
+                .attr("class", "state")
+                .attr("transform", function (d) { return "translate(" + x(d.dateIssueClosed) + ",0)"; });
 
-            svg.selectAll("bar")
-                .data(data.issuesArray)
+            state.selectAll("rect")
+                .data(function (d) { return d.statuses; })
                 .enter().append("rect")
-                .style("fill", "red")
-                .attr("x", function (d) {
-                    return x(d.dateIssueClosed);
-                })
-                .attr("width", x.rangeBand())
-                .attr("y", function (d) {
-                    return y(d.numberIssuesUnresolved);
-                })
-                .attr("height", function (d) {
-                    return height - y(d.numberIssuesUnresolved);
-                });
-            // svg.selectAll("bar")
-            //     .data(data.issuesArray)
-            //     .enter().append("rect")
-            //     .style("fill", "red")
-            //     .attr("x", function (d) {
-            //         return x(d.dateIssueClosed);
-            //     })
-            //     .attr("width", x.rangeBand())
-            //     .attr("y", function (d) {
-            //         return y(d.numberIssuesResolved);
-            //     })
-            //     .attr("height", function (d) {
-            //         return height - y(d.numberIssuesResolved);
-            //     });
+                .attr("width", x1.rangeBand())
+                .attr("x", function (d) { return x1(d.name); })
+                .attr("y", function (d) { return y(d.value); })
+                .attr("height", function (d) { return height - y(d.value); })
+                .style("fill", function (d) { return color(d.name); });
+
+            var legend = svg.selectAll(".legend")
+                .data(statusNames.slice().reverse())
+                .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+            legend.append("rect")
+                .attr("x", width - 18)
+                .attr("width", 18)
+                .attr("height", 18)
+                .style("fill", color);
+
+            legend.append("text")
+                .attr("x", width - 24)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .style("text-anchor", "end")
+                .text(function (d) { return d; });
 
         });
 
     </script>
 
 </body>
-
-
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<meta charset="utf-8">
-
-
-<script src="https://d3js.org/d3.v4.js"></script>
-
-
-<div id="my_dataviz"></div>
-
-
-<script>
-
-
-    // set the dimensions and margins of the graph
-    var margin = { top: 10, right: 30, bottom: 90, left: 40 },
-        width = 460 - margin.left - margin.right,
-        height = 450 - margin.top - margin.bottom;
-
-    // append the svg object to the body of the page
-    var svg = d3.select("#my_dataviz")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
-
-    // Parse the Data
-    d3.json("delete.json", function (data) {
-
-        // X axis
-        var x = d3.scaleBand()
-            .range([0, width])
-            .domain(data.map(function (d) { return d.classifiedIssueStatus; }))
-            .padding(0.2);
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
-
-        // Add Y axis
-        var y = d3.scaleLinear()
-            .domain([0, 13000])
-            .range([height, 0]);
-        svg.append("g")
-            .call(d3.axisLeft(y));
-
-        // Bars
-        svg.selectAll("mybar")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("x", function (d) { return x(d.classifiedIssueStatus); })
-            .attr("width", x.bandwidth())
-            .attr("fill", "#69b3a2")
-            // no bar at the beginning thus:
-            .attr("height", function (d) { return height - y(0); }) // always equal to 0
-            .attr("y", function (d) { return y(0); })
-
-        // Animation
-        // svg.selectAll("rect")
-        //     .transition()
-        //     .duration(800)
-        //     .attr("y", function (d) { return y(d.Value); })
-        //     .attr("height", function (d) { return height - y(d.Value); })
-        //     .delay(function (d, i) { console.log(i); return (i * 100) })
-
-    })
-
-</script> -->

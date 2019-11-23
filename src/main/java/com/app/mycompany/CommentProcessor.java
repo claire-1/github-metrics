@@ -49,7 +49,7 @@ public class CommentProcessor {
         }
     }
 
-    public void putCommentInDB(long issueId, Date issueClosedDate, GHIssueComment comment) throws SQLException {
+    public void putCommentInDB(long issueId, Date issueClosedDate, String comment) throws SQLException {
         String query = " insert into comments (relatedIssueId, dateIssueClosed, content)" + " values (?, ?, ?)";
 
         // Source TODO
@@ -57,7 +57,7 @@ public class CommentProcessor {
         PreparedStatement preparedStmt = conn.prepareStatement(query);
         preparedStmt.setLong(1, issueId);
         preparedStmt.setDate(2, issueClosedDate);
-        preparedStmt.setString(3, comment.getBody());
+        preparedStmt.setString(3, comment);
         // execute the query
         preparedStmt.execute();
     }
@@ -65,7 +65,7 @@ public class CommentProcessor {
     public void putCommentsInDB(long issueId, Date issueClosedDate, List<GHIssueComment> comments) throws SQLException {
         for (GHIssueComment comment : comments) {
             // TODO how to get the timestamp from the comments?
-            putCommentInDB(issueId, issueClosedDate, comment);
+            putCommentInDB(issueId, issueClosedDate, comment.getBody());
         }
     }
 
@@ -125,6 +125,7 @@ public class CommentProcessor {
             // https://waikato.github.io/weka-wiki/faqs/why_am_i_missing_certain_nominal_or_string_values_from_sparse_instances/
             Instances data = query.retrieveInstances();
             data.setClassIndex(data.numAttributes() - 1);
+            System.out.println("DATA HERE " + data.toString());
             return data;
         } catch (Exception e) {
             throw new RuntimeException("getAsDataSet|problem connecting with database loader", e);
@@ -160,14 +161,20 @@ public class CommentProcessor {
     }
 
     public String classifyData(Instances trainingData, Instances dataToBeClassified) throws Exception {
+        // TODO source: https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes
         Classifier classifier = new NaiveBayesMultinomial();
         classifier.buildClassifier(trainingData);
         Evaluation eval = new Evaluation(trainingData);
+        eval.evaluateModel(classifier, dataToBeClassified);
+        System.out.println("** Naive Bayes Evaluation with Datasets **");
+        System.out.println(eval.toSummaryString());
+        System.out.println(classifier);
         // eval.evaluateModel(classifier, dataToBeClassified);
         int classifiedIssue = 0; // The first result from the instances is the classification for the whole issue
                                  // the remaining issues are the classifications for each comment on the issue
-        System.out.println(dataToBeClassified.instance(classifiedIssue));
+       // System.out.println(dataToBeClassified.instance(classifiedIssue));
         double index = classifier.classifyInstance(dataToBeClassified.instance(classifiedIssue));
+        
         String classification = trainingData.attribute(0).value((int) index);
         System.out.println(classification);
         System.out.println("HELLO");
