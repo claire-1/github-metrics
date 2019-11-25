@@ -60,9 +60,10 @@ public class GithubAccess {
     // classification algorithm
 
     public static void main(String[] args) throws Exception {
-        GithubAccess github = new GithubAccess("claire-1/github-metrics");
-        // GithubAccess github = new GithubAccess("tootsuite/mastodon");
-        CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306", "storage", "root");
+        //GithubAccess github = new GithubAccess("claire-1/github-metrics");
+        //GithubAccess github = new GithubAccess("tootsuite/mastodon");
+        GithubAccess github = new GithubAccess("liyasthomas/postwoman");
+        MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
         // TODO change this back for issue with only getting some of the issues from
         // github but not all if there are a lot
         // TODO this is the thing to change GithubAccess github = new
@@ -75,48 +76,54 @@ public class GithubAccess {
         // System.out.println(issues.toString());
         System.out.println("NUMBER OF ISSUES " + issues.size());
 
-        // Put the comments in the database
-
+        // // Put the comments in the database
         for (int i = 0; i < issues.size(); i++) {
-            GHIssue currentIssue = issues.get(i);// TODO just the oldest issue for now
+            GHIssue currentIssue = issues.get(i);
+            
+            // TODO HERE ---> freezes when getting lots of issues, might be due
+            // to rate limitting on getComments, would be great if there was a way 
+            // just to get the last comment 
+            System.out.println("getting comments for issue number (starting at 0) " + i);
             List<GHIssueComment> currentIssueComments = IssueUtils.getComments(currentIssue);
             System.out.println("COMMENTS " + currentIssueComments.size());
             System.out.println(currentIssueComments);
             String lastestComment;
             if (currentIssueComments.size() > 1) {
                 lastestComment = currentIssueComments.get(currentIssueComments.size() - 1).getBody();
-                System.out.println("LAST COMMENT? " + currentIssueComments.get(currentIssueComments.size() - 1));
+                // System.out.println("LAST COMMENT? " +
+                // currentIssueComments.get(currentIssueComments.size() - 1));
             } else {
+                // There are no comments other than the issue body
                 lastestComment = currentIssue.getBody();
             }
-            // processorDB.putCommentsInDB(currentIssue.getId(),
-            // IssueUtils.getSqlDate(currentIssue), currentIssueComments);
-            // Only put the newest comment in the DB and decide if open/closed based on that
-            processorDB.putCommentInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), lastestComment);
 
-            Instances dataToBeClassified = processorDB.getAsDataSetFromSql(" select content from comments");
-            System.out.println("data set " + dataToBeClassified.toString());
-            String classification = processorDB.classifyData(trainingData, dataToBeClassified);
-            System.out.println("classification " + classification);
+            // // processorDB.putCommentsInDB(currentIssue.getId(),
+            // // IssueUtils.getSqlDate(currentIssue), currentIssueComments);
+            // // Only put the newest comment in the DB and decide if open/closed based on
+            // that
+            // processorDB.putCommentInDB(currentIssue.getId(),
+            // IssueUtils.getSqlDate(currentIssue), lastestComment);
 
-            // Put in database --> TODO should really be own test but the issue with adding
-            // to the database in different tests
+            // Instances dataToBeClassified = processorDB.getAsDataSetFromSql(" select
+            // content from comments");
+            // System.out.println("data set " + dataToBeClassified.toString());
+            CommentProcessor commentProcessor = new CommentProcessor();
+            String classification = commentProcessor.classifyData(trainingData, lastestComment);
+            // System.out.println("classification " + classification);
+
+            // // Put in database --> TODO should really be own test but the issue with
+            // adding
+            // // to the database in different tests
             processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue),
                     classification);
-            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue),
-                    "resolved");
-            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue),
-                    "unresolved");
-            processorDB.manipulateData(" delete from comments"); // execute a query to clear the database of comments so
-                                                                 // can be empty for next issue's comments
+            // TODO delete these two following lines once have more data to get classifer to work correctly
+            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), "resolved");
+            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), "unresolved");
+            // processorDB.manipulateData(" delete from comments"); // execute a query to
+            // clear the database of comments so
+            // // can be empty for next issue's comments
         }
 
-        // TODO source for query:
-        // https://stackoverflow.com/questions/14565788/how-to-group-by-month-from-date-field-using-sql
-        // TODO source for query:
-        // https://stackoverflow.com/questions/53848520/group-by-several-columns-with-count-on-another-column-sql-server
-        // TODO source for query:
-        // https://www.w3schools.com/sql/trymysql.asp?filename=trysql_func_mysql_date_format
         ResultSet rsFromDB = processorDB.getDataFromDatabaseAsResultSet(
                 " select DATE_FORMAT(dateIssueClosed, '%Y-%m') AS dateIssueClosed, SUM(CASE WHEN classifiedIssueStatus=\'unresolved\' THEN 1 ELSE 0 END) as numberIssuesUnresolved, SUM(CASE WHEN classifiedIssueStatus=\'resolved\' THEN 1 ELSE 0 END) as numberIssuesResolved from classifierResults GROUP BY DATE_FORMAT(dateIssueClosed, '%Y-%m') ORDER BY dateIssueClosed");
         System.out.println("RESULT SET " + rsFromDB.toString());
@@ -127,7 +134,7 @@ public class GithubAccess {
         String filePath = System.getProperty("user.dir") + "/display/php/classifications.json";
         System.out.println("FILE PATH " + filePath);
         File classificationToDisplayFile = new File(filePath);
-        // TODO source for FileWriter https://www.journaldev.com/878/java-write-to-file
+  
         FileWriter writer = new FileWriter(classificationToDisplayFile);
         // jsonOfDB.writeJSONString(jsonOfDB, classificationToDisplayFile);
         JSONObject wrapJsonOfDB = new JSONObject();
