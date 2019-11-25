@@ -1,5 +1,6 @@
 package com.app.mycompany;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -106,11 +107,11 @@ public class MySqlConnection {
         preparedStatement.execute();
     }
 
-    public void putClassificationInDB(long issueId, Date issueClosedDate, String classification) throws SQLException {
-        String query = " insert into classifierResults (relatedIssueId, dateIssueClosed, classifiedIssueStatus)"
+    public void putClassificationInDB(URL issueUrl, Date issueClosedDate, String classification) throws SQLException {
+        String query = " insert into classifierResults (relatedIssueUrl, dateIssueClosed, classifiedIssueStatus)"
                 + " values (?, ?, ?)";
         PreparedStatement preparedStmt = conn.prepareStatement(query);
-        preparedStmt.setLong(1, issueId);
+        preparedStmt.setURL(1, issueUrl);
         preparedStmt.setDate(2, issueClosedDate);
         preparedStmt.setString(3, classification);
         // execute the query

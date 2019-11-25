@@ -30,3 +30,4 @@ Source for dealing with ResultSets: https://www.javatpoint.com/example-to-connec
 Weka and getting Instances from SQL database: https://waikato.github.io/weka-wiki/use_weka_in_your_java_code/ \
 Source for how to use PreparedStatements in Java: https://alvinalexander.com/java/java-mysql-insert-example-preparedstatement \
 Source for checking return value of bash command for start.sh: https://stackoverflow.com/questions/15471264/how-to-check-if-is-not-equal-to-zero-in-unix-shell-scripting/15471312 \
+Source for bubble chart: https://www.freecodecamp.org/news/a-gentle-introduction-to-d3-how-to-build-a-reusable-bubble-chart-9106dc4f6c46/ and https://github.com/dmesquita/reusable_bubble_chart \

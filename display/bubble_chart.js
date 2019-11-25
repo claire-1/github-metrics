@@ -45,10 +45,10 @@ function bubbleChart() {
         marginTop = 96,
         minRadius = 6,
         maxRadius = 20,
-        columnForColors = "status",
-        columnForTitle = "url",
-        columnForDate = "date",
-        radius = 100,
+        columnForColors = "classifiedIssueStatus",
+        columnForTitle = "relatedIssueUrl",
+        columnForDate = "dateIssueClosed",
+        radius = 1000,
         forceApart = -50,
         unitName = "",
         customColors = false,
@@ -107,14 +107,14 @@ function bubbleChart() {
                 .range(customRange);
         }
 
-        var minRadiusDomain = d3.min(data, function (d) {
-            return radius;
-        });
-        var maxRadiusDomain = d3.max(data, function (d) {
-            return radius;
-        });
+        // var minRadiusDomain = d3.min(data, function (d) {
+        //     return radius;
+        // });
+        // var maxRadiusDomain = d3.max(data, function (d) {
+        //     return radius;
+        // });
         var scaleRadius = d3.scaleLinear()
-            .domain([minRadiusDomain, maxRadiusDomain])
+            .domain([radius, radius])
             .range([minRadius, maxRadius])
 
         var node = svg.selectAll("circle")
@@ -128,9 +128,7 @@ function bubbleChart() {
             .attr("id", function (d, i) {
                 return i;
             })
-            .attr('r', function (d) {
-                return scaleRadius(radius);
-            })
+            .attr('r', 10)
             .style("fill", function (d) {
                 return colorCircles(d[columnForColors]);
             })
