@@ -1,55 +1,10 @@
-@relation training
+@relation 'SMS spam'
 
-@attribute 'content' string
-@attribute status {resolved, unresolved}
+@attribute label {resolved,unresolved}
+@attribute text string
 
 @data
-'not', unresolved
-'fix', unresolved
-'fixed', resolved
-'instructions', resolved
-'issue', unresolved
-'?', unresolved
-'finished', resolved
-'another', resolved
-'not', unresolved
-'fix', unresolved
-'fixed', resolved
-'instructions', resolved
-'issue', unresolved
-'?', unresolved
-'finished', resolved
-'another', resolved
-'not', unresolved
-'fix', unresolved
-'fixed', resolved
-'instructions', resolved
-'issue', unresolved
-'?', unresolved
-'finished', resolved
-'another', resolved
-'not', unresolved
-'fix', unresolved
-'fixed', resolved
-'instructions', resolved
-'issue', unresolved
-'?', unresolved
-'finished', resolved
-'another', resolved
-'I found the problem and made a new pull request to fix it! Closing this issue now', resolved
-'I am closing this issue but it is not fixed', unresolved
-'super cool closing this issue', resolved
-'another comment', unresolved
-'I found the problem and made a new pull request to fix it! Closing this issue now', resolved
-'That's a cool suggestion! Will consider it.', unresolved
-'These changes were introduced last night', resolved
-'Anyway, will figure out a workaround for that too', unresolved
-'Thank you for the update. Looking forward to it.', unresolved
-'Will fix it ASAP', unresolved
-'Glad it worked out!', resolved
-'I think this should be left as it is since the user might want to copy contents from a history entry.', resolved
-'Oh! Will fix that.', unresolved
-'Solved in', resolved
-
-
-
+resolved,'Go until jurong point, crazy.. Available only in bugis n great world la e buffet... Cine there got amore wat...'
+unresolved,'Ok lar... Joking wif u oni...'
+unresolved,'Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 87121 to receive entry question(std txt rate)T&C\'s apply 08452810075over18\'s'
+resolved,'U dun say so early hor... U c already then say...'

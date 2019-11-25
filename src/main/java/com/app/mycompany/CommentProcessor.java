@@ -1,6 +1,9 @@
 package com.app.mycompany;
 
-import java.sql.Connection;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,21 +13,48 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayesMultinomial;
 import weka.classifiers.evaluation.Evaluation;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;
+import weka.core.converters.ArffLoader;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class CommentProcessor {
 
-    private Connection conn;
     private ArrayList<Attribute> wekaAttributes;
-    // private String connectionUrl;
-    // private String userName;
+   // private FilteredClassifier classifier;
+   private NaiveBayesMultinomial classifier;
 
     public CommentProcessor() {
+        this.classifier = new NaiveBayesMultinomial();
+        //classifier = new FilteredClassifier();
+
+        // set Multinomial NaiveBayes as arbitrary classifier
+       // classifier.setClassifier(new NaiveBayesMultinomial());
+
+        // TODO need filter?
+        // create the filter and set the attribute to be transformed from text into a
+        // feature vector (the last one)
+        // StringToWordVector filter = new StringToWordVector();
+        // filter.setAttributeIndices("last");
+
+        // // add ngram tokenizer to filter with min and max length set to 1
+        // NGramTokenizer tokenizer = new NGramTokenizer();
+        // tokenizer.setNGramMinSize(1);
+        // tokenizer.setNGramMaxSize(1);
+        // // use word delimeter
+        // tokenizer.setDelimiters("\\W");
+        // filter.setTokenizer(tokenizer);
+
+        // // convert tokens to lowercase
+        // filter.setLowerCaseTokens(true);
+
+        // // add filter to classifier
+        // classifier.setFilter(filter);
+
         // Declare text attribute to hold the message for the Instance
         Attribute attributeText = new Attribute("text", (List<String>) null);
 
@@ -78,8 +108,35 @@ public class CommentProcessor {
     // return classification;
     // }
 
+     // To use for training data in arff file
+     public static Instances getDataSetFromFile(String filename) {
+        // TODO Taken from source:
+        // https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes
+
+        StringToWordVector filter = new StringToWordVector();
+        ArffLoader loader = new ArffLoader();
+        try {
+            File fileOfData = new File(filename);
+            InputStream dataStream = new FileInputStream(fileOfData);
+            loader.setSource(dataStream);
+
+            Instances dataSet = loader.getDataSet();
+            // TODO explaination of class index source:
+            // https://stackoverflow.com/questions/26734189/what-is-class-index-in-weka
+            dataSet.setClassIndex(dataSet.numAttributes() - 1);
+            filter.setInputFormat(dataSet);
+            dataSet = Filter.useFilter(dataSet, filter);
+            return dataSet;
+        } catch (IOException e) {
+            throw new RuntimeException("getDataSetFromFile|can't access file", e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("getDataSetFromFile|can't set class index", e);
+        } catch (Exception e) {
+            throw new RuntimeException("getDataSetFromFile|can't set input format", e);
+        } // TODO maybe should just throw these to a higher level; fine for now
+    }
+
     public String classifyData(Instances trainingData, String dataToBeClassified) throws Exception {
-        Classifier classifier = new NaiveBayesMultinomial();
         classifier.buildClassifier(trainingData);
         Evaluation eval = new Evaluation(trainingData);
         eval.evaluateModel(classifier, trainingData);
@@ -87,12 +144,14 @@ public class CommentProcessor {
         System.out.println(eval.toSummaryString());
         System.out.println(classifier);
 
+
         // create new Instance for prediction.
-        DenseInstance newInstance = new DenseInstance(2);
+        int numAttributesFromArff = 2;
+        DenseInstance newInstance = new DenseInstance(numAttributesFromArff);
 
         // weka demand a dataset to be set to new Instance
         Instances newDataset = new Instances("predictiondata", wekaAttributes, 1);
-        newDataset.setClassIndex(0);
+        newDataset.setClassIndex(0); // makes data look like: resolved, 'some text'
 
         newInstance.setDataset(newDataset);
 

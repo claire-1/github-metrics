@@ -42,12 +42,7 @@ public class GithubAccess {
     public List<GHIssue> getClosedIssues() {
         List<GHIssue> allIssues = new LinkedList<>();
         try {
-
             return repo.getIssues(GHIssueState.CLOSED);
-            // while () {
-            // repo.listIssues(GHIssueState.CLOSED);
-            // }
-
         } catch (IOException e) {
             throw new RuntimeException("GithubAccess|could not get issues", e);
         }
@@ -70,7 +65,8 @@ public class GithubAccess {
         // GithubAccess("tootsuite/mastodon");
         List<GHIssue> issues = github.getClosedIssues();
         // Process data to get classification
-        Instances trainingData = processorDB.getDataSetFromFile("trainingData.arff");
+        Instances trainingData = CommentProcessor.getDataSetFromFile("trainingData.arff");
+        trainingData.setClassIndex(0); // data formatted resolved, 'some string'
         System.out.println("TRAINING DATA " + trainingData.toString());
 
         // System.out.println(issues.toString());
@@ -111,14 +107,11 @@ public class GithubAccess {
             String classification = commentProcessor.classifyData(trainingData, lastestComment);
             // System.out.println("classification " + classification);
 
-            // // Put in database --> TODO should really be own test but the issue with
-            // adding
-            // // to the database in different tests
             processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue),
                     classification);
             // TODO delete these two following lines once have more data to get classifer to work correctly
-            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), "resolved");
-            processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), "unresolved");
+           ///// processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), "resolved");
+           ////// processorDB.putClassificationInDB(currentIssue.getId(), IssueUtils.getSqlDate(currentIssue), "unresolved");
             // processorDB.manipulateData(" delete from comments"); // execute a query to
             // clear the database of comments so
             // // can be empty for next issue's comments

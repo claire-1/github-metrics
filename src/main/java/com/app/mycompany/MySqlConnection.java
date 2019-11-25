@@ -1,9 +1,5 @@
 package com.app.mycompany;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -16,10 +12,7 @@ import java.util.Properties;
 import org.kohsuke.github.GHIssueComment;
 
 import weka.core.Instances;
-import weka.core.converters.ArffLoader;
 import weka.experiment.InstanceQuery;
-import weka.filters.Filter;
-import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class MySqlConnection {
 
@@ -64,33 +57,7 @@ public class MySqlConnection {
         }
     }
 
-    // To use for training data in arff file
-    public Instances getDataSetFromFile(String filename) {
-        // TODO Taken from source:
-        // https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes
-
-        StringToWordVector filter = new StringToWordVector();
-        ArffLoader loader = new ArffLoader();
-        try {
-            File fileOfData = new File(filename);
-            InputStream dataStream = new FileInputStream(fileOfData);
-            loader.setSource(dataStream);
-
-            Instances dataSet = loader.getDataSet();
-            // TODO explaination of class index source:
-            // https://stackoverflow.com/questions/26734189/what-is-class-index-in-weka
-            dataSet.setClassIndex(dataSet.numAttributes() - 1);
-            filter.setInputFormat(dataSet);
-            dataSet = Filter.useFilter(dataSet, filter);
-            return dataSet;
-        } catch (IOException e) {
-            throw new RuntimeException("getDataSetFromFile|can't access file", e);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("getDataSetFromFile|can't set class index", e);
-        } catch (Exception e) {
-            throw new RuntimeException("getDataSetFromFile|can't set input format", e);
-        } // TODO maybe should just throw these to a higher level; fine for now
-    }
+   
 
     // TODO delete this probably
     public String getDataFromDatabase(String query) throws SQLException { // TODO this is just for testing for now
