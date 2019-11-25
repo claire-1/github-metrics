@@ -121,13 +121,15 @@ public class CommentProcessor {
 
     public String classifyData(Instances trainingData, String dataToBeClassified) throws Exception {
         // create new Instance for prediction.
-        int numAttributesFromArff = 2; // label and text
-        DenseInstance newInstance = new DenseInstance(numAttributesFromArff);
-
+        int numAttributesFromArff = 2; // for label and text
+        StringToWordVector filter = new StringToWordVector();
         // weka demand a dataset to be set to new Instance
         Instances newDataset = new Instances("predictiondata", wekaAttributes, 1);
         newDataset.setClassIndex(0); // makes data look like: resolved, 'some text'
+        filter.setInputFormat(newDataset);
+        newDataset = Filter.useFilter(newDataset, filter);
 
+        DenseInstance newInstance = new DenseInstance(numAttributesFromArff);
         newInstance.setDataset(newDataset);
 
         // text attribute value set to value to be predicted

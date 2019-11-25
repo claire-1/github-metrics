@@ -6,18 +6,6 @@ import org.junit.Test;
 
 import weka.core.Instances;
 
-// import static org.junit.Assert.assertEquals;
-
-// import java.sql.Date;
-// import java.sql.SQLException;
-// import java.util.List;
-
-// import org.junit.Test;
-// import org.kohsuke.github.GHIssue;
-// import org.kohsuke.github.GHIssueComment;
-
-// import weka.core.Instances;
-
 public class CommentProcessorTest {
 
     @Test
@@ -41,6 +29,9 @@ public class CommentProcessorTest {
         String classification = processor.classifyData(trainingData, "how are you ?");
         assertEquals("ham", classification);
     }
+
+// TODO end of new tests that should work if classifier was working
+
 
     // // Given a comment, put it in the database
     // @Test
