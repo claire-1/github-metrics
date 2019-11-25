@@ -132,16 +132,33 @@ function bubbleChart() {
             .style("fill", function (d) {
                 return colorCircles(d[columnForColors]);
             })
+            // Tooltip stuff after this
+            // .on("mouseover", function (d) {
+            //     tooltip.transition()
+            //         .duration(500)
+            //         .style("opacity", 0);
+            //     tooltip.transition()
+            //         .duration(200)
+            //         .style("opacity", .9);
+            //     tooltip.html(
+            //         '<a href= "http://google.com">' + // The first <a> tag
+            //         d[columnForTitle] +
+            //         "</a>" +                          // closing </a> tag
+            //         "<br/>" + d.close)
+            //         .style("left", (d3.event.pageX) + "px")
+            //         .style("top", (d3.event.pageY - 28) + "px");
+            //     return tooltip.style("visibility", "visible");
+            // });
             .on("mouseover", function (d) {
-                tooltip.html(d[columnForTitle] + "<br/>" + d[columnForColors] + "<br/>" + d[columnForDate] + " " + unitName);
+                tooltip.html("<a href=" + d[columnForTitle] + ">" + d[columnForTitle] + "</a>" + "<br/>" + d[columnForColors] + "<br/>" + d[columnForDate] + " " + unitName);
                 return tooltip.style("visibility", "visible");
             })
             .on("mousemove", function () {
                 return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
-            })
-            .on("mouseout", function () {
-                return tooltip.style("visibility", "hidden");
             });
+        // .on("mouseout", function () {
+        //     return tooltip.style("visibility", "hidden");
+        // });
         node.append("clipPath")
             .attr("id", function (d, i) {
                 return "clip-" + i;
@@ -166,8 +183,25 @@ function bubbleChart() {
                 .text(function (d) {
                     return d[columnForTitle];
                 })
+                // Tooltip stuff after this
+                // .on("mouseover", function (d) {
+                //     tooltip.transition()
+                //         .duration(500)
+                //         .style("opacity", 0);
+                //     tooltip.transition()
+                //         .duration(200)
+                //         .style("opacity", .9);
+                //     tooltip.html(
+                //         '<a href= "http://google.com">' + // The first <a> tag
+                //         d[columnForTitle] +
+                //         "</a>" +                          // closing </a> tag
+                //         "<br/>" + d.close)
+                //         .style("left", (d3.event.pageX) + "px")
+                //         .style("top", (d3.event.pageY - 28) + "px");
+                //     return tooltip.style("visibility", "visible");
+                // });
                 .on("mouseover", function (d) {
-                    tooltip.html(d[columnForTitle] + "<br/>" + d[columnForColors] + "<br/>" + d[columnForRadius] + " " + unitName);
+                    tooltip.html('<a href=' + d[columnForTitle] + '></a>' + "<br/>" + d[columnForColors] + "<br/>" + d[columnForRadius] + " " + unitName);
                     return tooltip.style("visibility", "visible");
                 })
                 .on("mousemove", function () {
