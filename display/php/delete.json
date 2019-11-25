@@ -4,7 +4,12 @@
             "dateIssueClosed": "2013-01",
             "numberIssuesClosed": 20,
             "numberIssuesResolved": 4,
-            "relatedClosedIssueIds": [
+            "relatedUnresolvedIssueIds": [
+                100,
+                300,
+                9
+            ],
+            "relatedResolvedIssueIds": [
                 1000,
                 3000,
                 90
@@ -14,7 +19,12 @@
             "dateIssueClosed": "2013-03",
             "numberIssuesClosed": 10,
             "numberIssuesResolved": 4,
-            "relatedClosedIssueIds": [
+            "relatedUnresolvedIssueIds": [
+                100,
+                300,
+                9
+            ],
+            "relatedResolvedIssueIds": [
                 1000,
                 3000,
                 90
@@ -24,7 +34,12 @@
             "dateIssueClosed": "2013-02",
             "numberIssuesClosed": 40,
             "numberIssuesResolved": 4,
-            "relatedClosedIssueIds": [
+            "relatedUnresolvedIssueIds": [
+                100,
+                300,
+                9
+            ],
+            "relatedResolvedIssueIds": [
                 1000,
                 3000,
                 90

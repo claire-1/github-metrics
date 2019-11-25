@@ -1,0 +1,13 @@
+{
+    "name": "flare",
+    "issues": [
+        {
+            "name": "SomeUrlForIssue",
+            "size": 3938
+        },
+        {
+            "name": "SomeUrlForIssue2",
+            "size": 3938
+        }
+    ]
+}

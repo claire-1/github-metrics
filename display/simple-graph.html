@@ -7,9 +7,11 @@
 
 <!-- TODO newest source: https://stackoverflow.com/questions/39169948/grouped-bar-chart-from-json-data-instead-of-csv-->
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 
 <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
     <style>
         .axis {
             font: 10px sans-serif;
@@ -63,14 +65,17 @@
                 "translate(" + margin.left + "," + margin.top + ")");
 
 
-        d3.json("php/classifications.json", function (error, data) {
+        // d3.json("php/classifications.json", function (error, data) {
+        d3.json("php/delete.json", function (error, data) {
             var statusNames = d3.keys(data.issuesArray[0]).filter(function (key) { return key !== "dateIssueClosed"; });
+
 
             data.issuesArray.forEach(function (d) {
                 d.statuses = statusNames.map(function (name) { return { name: name, value: +d[name] }; });
                 d.dateIssueClosed = parseDate(d.dateIssueClosed);
                 d.numberIssuesUnresolved = +d.numberIssuesUnresolved;
                 d.numberIssuesResolved = +d.numberIssuesResolved;
+                d.relatedResolvedIssueIds = d.relatedResolvedIssueIds.push(d.relatedResolvedIssueIds);
             });
 
 
@@ -105,14 +110,24 @@
                 .enter().append("g")
                 .attr("class", "state")
                 .attr("transform", function (d) { return "translate(" + x(d.dateIssueClosed) + ",0)"; });
-
+            //// var stackedData = d3.stack().keys(data.issuesArray.relatedClosedIssues);
+            // var stackedData = d3.layout.stack().value(function (d) { return d.relatedResolvedIssueIds.pop() })(data.issuesArray);
+            // TODO from https://d3-wiki.readthedocs.io/zh_CN/master/Stack-Layout/
+            var stack = d3.layout.stack()
+                .offset("wiggle")
+                .values(function (d) { return d.relatedResolvedIssueIds; });
             state.selectAll("rect")
                 .data(function (d) { return d.statuses; })
                 .enter().append("rect")
                 .attr("width", x1.rangeBand())
+                //// .data(function (d) { return d3.stack()(d.relatedClosedIssues); })
+                //.data(function (d) { return stack; })
+                //// .enter().append("rect")
                 .attr("x", function (d) { return x1(d.name); })
                 .attr("y", function (d) { return y(d.value); })
+                ////.attr("y", function (d) { return y(d[1]); })
                 .attr("height", function (d) { return height - y(d.value); })
+                ////.attr("height", function (d) { return y(d[0]) - y(d[1]); })
                 .style("fill", function (d) { return color(d.name); });
 
             var legend = svg.selectAll(".legend")
