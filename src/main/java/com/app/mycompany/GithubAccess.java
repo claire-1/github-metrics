@@ -57,9 +57,9 @@ public class GithubAccess {
     // classification algorithm
 
     public static void main(String[] args) throws Exception {
-        GithubAccess github = new GithubAccess("claire-1/github-metrics");
+        // GithubAccess github = new GithubAccess("claire-1/github-metrics");
         // GithubAccess github = new GithubAccess("tootsuite/mastodon");
-        // GithubAccess github = new GithubAccess("liyasthomas/postwoman");
+        GithubAccess github = new GithubAccess("liyasthomas/postwoman");
         MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
         // TODO change this back for issue with only getting some of the issues from
         // github but not all if there are a lot

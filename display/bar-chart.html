@@ -65,8 +65,7 @@
                 "translate(" + margin.left + "," + margin.top + ")");
 
 
-        // d3.json("php/classifications.json", function (error, data) {
-        d3.json("php/delete.json", function (error, data) {
+        d3.json("php/classifications.json", function (error, data) {
             var statusNames = d3.keys(data.issuesArray[0]).filter(function (key) { return key !== "dateIssueClosed"; });
 
 
@@ -75,7 +74,6 @@
                 d.dateIssueClosed = parseDate(d.dateIssueClosed);
                 d.numberIssuesUnresolved = +d.numberIssuesUnresolved;
                 d.numberIssuesResolved = +d.numberIssuesResolved;
-                d.relatedResolvedIssueIds = d.relatedResolvedIssueIds.push(d.relatedResolvedIssueIds);
             });
 
 
@@ -110,12 +108,7 @@
                 .enter().append("g")
                 .attr("class", "state")
                 .attr("transform", function (d) { return "translate(" + x(d.dateIssueClosed) + ",0)"; });
-            //// var stackedData = d3.stack().keys(data.issuesArray.relatedClosedIssues);
-            // var stackedData = d3.layout.stack().value(function (d) { return d.relatedResolvedIssueIds.pop() })(data.issuesArray);
-            // TODO from https://d3-wiki.readthedocs.io/zh_CN/master/Stack-Layout/
-            var stack = d3.layout.stack()
-                .offset("wiggle")
-                .values(function (d) { return d.relatedResolvedIssueIds; });
+
             state.selectAll("rect")
                 .data(function (d) { return d.statuses; })
                 .enter().append("rect")
