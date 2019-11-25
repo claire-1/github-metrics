@@ -85,7 +85,7 @@ public class GithubAccess {
         //     }
         //     // IssueUtils.getSqlDate(currentIssue), lastestComment);
 
-        //     CommentProcessor commentProcessor = new CommentProcessor();
+        //     CommentProcessor commentProcessor = new CommentProcessor(trainingData, "resolved", "unresolved");
         //     String classification = commentProcessor.classifyData(trainingData, lastestComment);
         //     // System.out.println("classification " + classification);
 

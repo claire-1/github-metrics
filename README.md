@@ -29,3 +29,4 @@ Source for making String comment into Instances with Attributes: https://github.
 Source for dealing with ResultSets: https://www.javatpoint.com/example-to-connect-to-the-mysql-database \
 Weka and getting Instances from SQL database: https://waikato.github.io/weka-wiki/use_weka_in_your_java_code/ \
 Source for how to use PreparedStatements in Java: https://alvinalexander.com/java/java-mysql-insert-example-preparedstatement \
+Source for checking return value of bash command for start.sh: https://stackoverflow.com/questions/15471264/how-to-check-if-is-not-equal-to-zero-in-unix-shell-scripting/15471312 \

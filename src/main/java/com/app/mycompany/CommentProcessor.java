@@ -28,8 +28,14 @@ public class CommentProcessor {
    // private FilteredClassifier classifier;
    private NaiveBayesMultinomial classifier;
 
-    public CommentProcessor() {
+    public CommentProcessor(Instances trainingData, String attributeLabel1, String attributeLabel2) throws Exception {
         this.classifier = new NaiveBayesMultinomial();
+        classifier.buildClassifier(trainingData);
+        Evaluation eval = new Evaluation(trainingData);
+        eval.evaluateModel(classifier, trainingData);
+        System.out.println("** Naive Bayes Evaluation with Datasets **");
+        System.out.println(eval.toSummaryString());
+        System.out.println(classifier);
         //classifier = new FilteredClassifier();
 
         // set Multinomial NaiveBayes as arbitrary classifier
@@ -60,8 +66,8 @@ public class CommentProcessor {
 
         // Declare the label attribute along with its values
         ArrayList<String> classAttributeValues = new ArrayList<>();
-        classAttributeValues.add("resolved");
-        classAttributeValues.add("unresolved");
+        classAttributeValues.add(attributeLabel1);
+        classAttributeValues.add(attributeLabel2);
         Attribute classAttribute = new Attribute("label", classAttributeValues);
 
         // Declare the feature vector
@@ -84,29 +90,6 @@ public class CommentProcessor {
         }
         return jsonArray;
     }
-
-    // public String classifyData(Instances trainingData, Instances
-    // dataToBeClassified) throws Exception {
-    // Classifier classifier = new NaiveBayesMultinomial();
-    // classifier.buildClassifier(trainingData);
-    // Evaluation eval = new Evaluation(trainingData);
-    // eval.evaluateModel(classifier, dataToBeClassified);
-    // System.out.println("** Naive Bayes Evaluation with Datasets **");
-    // System.out.println(eval.toSummaryString());
-    // System.out.println(classifier);
-    // // eval.evaluateModel(classifier, dataToBeClassified);
-    // int classifiedIssue = 0; // The first result from the instances is the
-    // classification for the whole issue
-    // // the remaining issues are the classifications for each comment on the issue
-    // // System.out.println(dataToBeClassified.instance(classifiedIssue));
-    // double index =
-    // classifier.classifyInstance(dataToBeClassified.instance(classifiedIssue));
-
-    // String classification = trainingData.attribute(0).value((int) index);
-    // System.out.println(classification);
-    // System.out.println("HELLO");
-    // return classification;
-    // }
 
      // To use for training data in arff file
      public static Instances getDataSetFromFile(String filename) {
@@ -137,16 +120,8 @@ public class CommentProcessor {
     }
 
     public String classifyData(Instances trainingData, String dataToBeClassified) throws Exception {
-        classifier.buildClassifier(trainingData);
-        Evaluation eval = new Evaluation(trainingData);
-        eval.evaluateModel(classifier, trainingData);
-        System.out.println("** Naive Bayes Evaluation with Datasets **");
-        System.out.println(eval.toSummaryString());
-        System.out.println(classifier);
-
-
         // create new Instance for prediction.
-        int numAttributesFromArff = 2;
+        int numAttributesFromArff = 2; // label and text
         DenseInstance newInstance = new DenseInstance(numAttributesFromArff);
 
         // weka demand a dataset to be set to new Instance
@@ -163,4 +138,28 @@ public class CommentProcessor {
 
         return newDataset.classAttribute().value((int) pred);
     }
+
+
+    // public String classifyData(Instances trainingData, Instances
+    // dataToBeClassified) throws Exception {
+    // Classifier classifier = new NaiveBayesMultinomial();
+    // classifier.buildClassifier(trainingData);
+    // Evaluation eval = new Evaluation(trainingData);
+    // eval.evaluateModel(classifier, dataToBeClassified);
+    // System.out.println("** Naive Bayes Evaluation with Datasets **");
+    // System.out.println(eval.toSummaryString());
+    // System.out.println(classifier);
+    // // eval.evaluateModel(classifier, dataToBeClassified);
+    // int classifiedIssue = 0; // The first result from the instances is the
+    // classification for the whole issue
+    // // the remaining issues are the classifications for each comment on the issue
+    // // System.out.println(dataToBeClassified.instance(classifiedIssue));
+    // double index =
+    // classifier.classifyInstance(dataToBeClassified.instance(classifiedIssue));
+
+    // String classification = trainingData.attribute(0).value((int) index);
+    // System.out.println(classification);
+    // System.out.println("HELLO");
+    // return classification;
+    // }
 }

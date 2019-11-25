@@ -21,13 +21,25 @@ import weka.core.Instances;
 public class CommentProcessorTest {
 
     @Test
-    public void givenTrainedClassifierShouldClassifyString() throws Exception {
-        CommentProcessor processor = new CommentProcessor();
-        Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("trainingDataTest.arff").getFile());
+    public void givenTrainedClassifierShouldClassifyStringAsSpam() throws Exception {
+        Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
         trainingData.setClassIndex(0); // data formatted resolved, 'some string'
+        
+        CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
         
         String classification = processor.classifyData(trainingData, "u have won the 1 lakh prize");
         assertEquals("spam", classification);
+    }
+
+    @Test
+    public void givenTrainedClassifierShouldClassifyStringAsHam() throws Exception {
+        Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        trainingData.setClassIndex(0); // data formatted resolved, 'some string'
+        
+        CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
+        
+        String classification = processor.classifyData(trainingData, "how are you ?");
+        assertEquals("ham", classification);
     }
 
     // // Given a comment, put it in the database
