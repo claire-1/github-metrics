@@ -1,5 +1,7 @@
 package com.app.mycompany;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 import weka.core.Instances;
@@ -19,9 +21,13 @@ import weka.core.Instances;
 public class CommentProcessorTest {
 
     @Test
-    public void givenTrainedClassifierShouldClassifyString() {
+    public void givenTrainedClassifierShouldClassifyString() throws Exception {
         CommentProcessor processor = new CommentProcessor();
         Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("trainingDataTest.arff").getFile());
+        trainingData.setClassIndex(0); // data formatted resolved, 'some string'
+        
+        String classification = processor.classifyData(trainingData, "u have won the 1 lakh prize");
+        assertEquals("spam", classification);
     }
 
     // // Given a comment, put it in the database
