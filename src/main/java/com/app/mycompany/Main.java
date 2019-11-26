@@ -20,9 +20,9 @@ import weka.core.Instances;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        GithubAccess github = new GithubAccess("claire-1/github-metrics");
+        //GithubAccess github = new GithubAccess("claire-1/github-metrics");
         // GithubAccess github = new GithubAccess("tootsuite/mastodon");
-        // GithubAccess github = new GithubAccess("liyasthomas/postwoman");
+        GithubAccess github = new GithubAccess("liyasthomas/postwoman");
         MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
         // TODO change this back for issue with only getting some of the issues from
         // github but not all if there are a lot
@@ -65,8 +65,8 @@ public class Main {
                     classification);
             // TODO delete these two following lines once have more data to get classifer to
             // work correctly
-            processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue), "resolved");
-            processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue), "unresolved");
+         //   processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue), "resolved");
+         //   processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue), "unresolved");
 
         }
 
@@ -101,7 +101,5 @@ public class Main {
         csvWriter.close();
 
         processorDB.close();
-
-        // TODO need to make a way to close the connection
     }
 }

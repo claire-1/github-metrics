@@ -1,6 +1,6 @@
 #/bin/bash
 mvn clean package 
-mvn exec:java -Dexec.mainClass=com.app.mycompany.GithubAccess -Dexec.cleanupDaemonThreads=false #-Djava.awt.headless=true
+mvn exec:java -Dexec.mainClass=com.app.mycompany.Main -Dexec.cleanupDaemonThreads=false #-Djava.awt.headless=true
 
 ret=$?
 # if [ $ret -ne 0 ]; then

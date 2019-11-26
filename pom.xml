@@ -50,7 +50,7 @@
                 <version>1.6.0</version>
                 <configuration>
                     <!-- <classpathScope>main</classpathScope> -->
-                    <mainClass>com.app.mycompany.GithubAccess</mainClass>
+                    <mainClass>com.app.mycompany.Main</mainClass>
                 </configuration>
                 <executions>
                     <execution>
