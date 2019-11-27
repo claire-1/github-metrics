@@ -2,7 +2,7 @@
 For SWE module. To display information about engineering data gotten through the GitHub API.
 
 ## Social Graph Description
-As of commit TODO on the master branch I have my Social Graph project working. \
+As of commit 4560b2a9a37ab866f1a3141196b9189ec3b2e988 on the master branch I have my Social Graph project working. \
 \
 For this project, I got comments from issues on Github repositories. I used Naive Bayes to do sentiment analysis on the comments to decide if they were really resolved or if they were simply closed. I choose Naive Bayes to be my classification algorithm because it is the algorithm traditionally used for spam detection, which I thought was a similar process to this. After I classify the issues, I display the results in a bar chat and in a bubble chart. The bar chart lets you see the number of issues resolved and closed over time. The bubble chart lets you see the individual resolved and closed issues and click on links to see more information about each issue. 
 
