@@ -57,7 +57,6 @@ public class FilteredClassifierTrainer {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             ArffReader arff = new ArffReader(reader);
             Instances trainData = arff.getData();
-            System.out.println("===== Loaded dataset: " + fileName + " =====");
             reader.close();
             trainData.setClassIndex(0);
             return trainData;
@@ -75,11 +74,10 @@ public class FilteredClassifierTrainer {
         try {
             Evaluation eval = new Evaluation(trainingData);
             eval.crossValidateModel(classifier, trainingData, 4, new Random(1));
-            System.out.println(eval.toSummaryString());
-            System.out.println(eval.toClassDetailsString());
-            System.out.println("===== Evaluating on filtered (training) dataset done =====");
+            // System.out.println(eval.toSummaryString());
+            // System.out.println(eval.toClassDetailsString());
         } catch (Exception e) {
-            System.out.println("Problem found when evaluating");
+            throw new RuntimeException("evaluate|error when evaluating classifier", e);
         }
     }
 
@@ -97,9 +95,8 @@ public class FilteredClassifierTrainer {
             classifier.buildClassifier(trainingData);
             // Uncomment to see the classifier
             // System.out.println(classifier);
-            System.out.println("===== Training on filtered (training) dataset done =====");
         } catch (Exception e) {
-            System.out.println("Problem found when training");
+            throw new RuntimeException("trainClassifier|error when training classifier", e);
         }
     }
 
@@ -114,7 +111,6 @@ public class FilteredClassifierTrainer {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
             out.writeObject(classifier);
             out.close();
-            System.out.println("===== Saved model: " + fileName + " =====");
         } catch (IOException e) {
             throw new RuntimeException("saveModel|error when writing to " + fileName, e);
         }

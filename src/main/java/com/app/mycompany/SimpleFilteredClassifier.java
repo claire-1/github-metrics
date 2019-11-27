@@ -1,6 +1,7 @@
 package com.app.mycompany;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +42,8 @@ public class SimpleFilteredClassifier {
 			Object tmp = in.readObject();
 			classifier = (FilteredClassifier) tmp;
 			in.close();
-			System.out.println("===== Loaded model: " + fileName + " =====");
 			return classifier;
-		} catch (Exception e) {
-			// Given the cast, a ClassNotFoundException must be caught along with the
-			// IOException
-			System.out.println("Problem found when reading: " + fileName);
+		} catch (ClassNotFoundException | IOException e) {
 			throw new RuntimeException("loadModel|error when reading " + fileName, e);
 		}
 	}
@@ -87,11 +84,10 @@ public class SimpleFilteredClassifier {
 		try {
 			// There is just one instance because there is one comment processed at at time
 			double pred = classifier.classifyInstance(unlabledDataInstance.instance(0));
-			System.out.println("===== Classified instance =====");
-			System.out.println("Class predicted: " + unlabledDataInstance.classAttribute().value((int) pred));
-			return unlabledDataInstance.classAttribute().value((int) pred);
+			String classification = unlabledDataInstance.classAttribute().value((int) pred);
+			System.out.println("Data classified as " + classification);
+			return classification;
 		} catch (Exception e) {
-			System.out.println("Problem found when classifying the text");
 			throw new RuntimeException("classify|error when classifying the text", e);
 		}
 	}

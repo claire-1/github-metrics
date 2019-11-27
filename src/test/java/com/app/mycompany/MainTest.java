@@ -44,8 +44,6 @@ public class MainTest {
     // @Test
     // public void givenDatabaseConnectionShouldConnectWithoutErrors() throws
     // SQLException {
-    // // TODO not the greatest test either b/c really should mock/assume connection
-    // // works so don't need to test it in the end
     // CommentProcessor processorDB = new CommentProcessor("comments-sql-db:3306",
     // "storage","root");
     // GithubAccess access = new GithubAccess("claire-1/github-metrics");
@@ -57,10 +55,6 @@ public class MainTest {
     // commentsForFirstIssue);
 
     // // assertEquals("another comment!", processorDB.getComments());
-    // // TODO above breaks when writing more tests with putting things in the
-    // database
-    // // TODO b/c needs to be mocked, which isn't happening right now so just
-    // commenting out
     // }
 
     // @Test
@@ -85,8 +79,6 @@ public class MainTest {
     // String classification = processorDB.classifyData(trainingData,
     // dataToBeClassified);
 
-    // // Put in database --> TODO should really be own test but the issue with
-    // adding to the database in different tests
     // processorDB.putClassificationInDB(secondIssue.getId(), sqlDate,
     // classification);
     // assertEquals("resolved", classification);

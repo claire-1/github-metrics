@@ -21,9 +21,9 @@ import weka.core.Instances;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        String repo = "claire-1/github-metrics";
+        // String repo = "claire-1/github-metrics";
         // String repo = "tootsuite/mastodon";
-        // String repo = "liyasthomas/postwoman";
+        String repo = "liyasthomas/postwoman";
         GithubAccess github = new GithubAccess(repo);
 
         SqlConnection processorDB = new SqlConnection("comments-sql-db:3306", "storage", "root", "root");
@@ -33,8 +33,9 @@ public class Main {
 
         // Train classifier.
         FilteredClassifierTrainer trainer = new FilteredClassifierTrainer();
-        Instances trainingData = trainer.loadDataset("trainingData.arff");
-        // Evaluation mus be done before training
+        String trainingDataFile = Main.class.getResource("/trainingData.arff").getFile();
+        Instances trainingData = trainer.loadDataset(trainingDataFile);
+        // Evaluation must be done before training
         // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
         trainer.evaluate(trainingData);
         trainer.trainClassifier(trainingData);
@@ -42,11 +43,6 @@ public class Main {
         // Get the last comment for each issue
         for (int i = 0; i < issues.size(); i++) {
             GHIssue currentIssue = issues.get(i);
-
-            // TODO HERE ---> freezes when getting lots of issues, might be due
-            // to rate limitting on getComments, would be great if there was a way
-            // just to get the last comment
-            System.out.println("getting comments for issue number (starting at 0) " + i);
             
             // Get all the comments since there isn't a method to just get one specific comment.
             List<GHIssueComment> currentIssueComments = IssueUtils.getComments(currentIssue);
@@ -71,10 +67,9 @@ public class Main {
                 " select DATE_FORMAT(dateIssueClosed, '%Y-%m') AS dateIssueClosed, SUM(CASE WHEN classifiedIssueStatus=\'unresolved\' THEN 1 ELSE 0 END) as numberIssuesUnresolved, SUM(CASE WHEN classifiedIssueStatus=\'resolved\' THEN 1 ELSE 0 END) as numberIssuesResolved from classifierResults GROUP BY DATE_FORMAT(dateIssueClosed, '%Y-%m') ORDER BY dateIssueClosed");
 
         JSONArray jsonOfDB = ResultSetUtils.convertToJSON(rsFromDB);
-        System.out.println("JSON " + jsonOfDB.toString());
+        // System.out.println("Json results: " + jsonOfDB.toString());
 
         String filePath = System.getProperty("user.dir") + "/display/classificationOutput/classifications.json";
-        System.out.println("FILE PATH " + filePath);
         File classificationToDisplayFile = new File(filePath);
 
         FileWriter writer = new FileWriter(classificationToDisplayFile);
