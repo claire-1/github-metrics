@@ -11,8 +11,7 @@
             console.error('Error getting or parsing the data.');
             throw error;
         }
-        var chart = bubbleChart().width(600).height(400);
-        // selection.datum() returns the bound datum for the first element in the selection and doesn't join the specified array of data with the selected elements
+        var chart = bubbleChart().width(2000).height(1000);
         d3.select('#chart').datum(data).call(chart);
     });
 </script>

@@ -40,8 +40,8 @@
  * @returns Chart function so that you can render the chart when ready
  */
 function bubbleChart() {
-    var width = 960,
-        height = 960,
+    var width = 2000,
+        height = 2000,
         marginTop = 96,
         minRadius = 6,
         maxRadius = 20,
