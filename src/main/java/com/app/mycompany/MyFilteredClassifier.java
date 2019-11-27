@@ -93,11 +93,10 @@ import weka.core.Instances;
 	 */
 	public void makeInstance(String data, String attributeName1, String attributeName2) {
 		// Create the attributes, class and text
-        //FastVector fvNominalVal = new FastVector(2);
         ArrayList<String> fvNominalVal = new ArrayList<String>();
-		fvNominalVal.add("spam");
-		fvNominalVal.add("ham");
-		Attribute attribute1 = new Attribute("class", fvNominalVal);
+		fvNominalVal.add(attributeName1);
+		fvNominalVal.add(attributeName2);
+		Attribute attribute1 = new Attribute("label", fvNominalVal);
         Attribute attribute2 = new Attribute("text", (List < String >) null);
    
            // Declare the feature vector
