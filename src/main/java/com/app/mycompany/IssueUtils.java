@@ -22,8 +22,6 @@ public class IssueUtils {
     }
 
     public static Date getSqlDate(GHIssue issue) {
-        // TODO source for date conversion:
-        // https://stackoverflow.com/questions/530012/how-to-convert-java-util-date-to-java-sql-date
         java.util.Date utilDate = issue.getClosedAt();
         Date sqlDate = new Date(utilDate.getTime());
 

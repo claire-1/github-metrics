@@ -26,18 +26,12 @@ public class Main {
         // String repo = "liyasthomas/postwoman";
         GithubAccess github = new GithubAccess(repo);
 
-        MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
-        // TODO change this back for issue with only getting some of the issues from
-        // github but not all if there are a lot
-        // TODO this is the thing to change GithubAccess github = new
-        // GithubAccess("tootsuite/mastodon");
-        List<GHIssue> issues = github.getClosedIssues();
-        // Process data to get classification
-        // Instances trainingData =
-        // CommentProcessor.getDataSetFromFile("trainingData.arff");
-        // trainingData.setClassIndex(0); // data formatted resolved, 'some string' TODO
-        // System.out.println("TRAINING DATA " + trainingData.toString());
+        SqlConnection processorDB = new SqlConnection("comments-sql-db:3306", "storage", "root", "root");
 
+        // Get all the issues.
+        List<GHIssue> issues = github.getClosedIssues();
+
+        // Train classifier.
         FilteredClassifierTrainer trainer = new FilteredClassifierTrainer();
         Instances trainingData = trainer.loadDataset("trainingData.arff");
         // Evaluation mus be done before training
@@ -53,35 +47,24 @@ public class Main {
             // to rate limitting on getComments, would be great if there was a way
             // just to get the last comment
             System.out.println("getting comments for issue number (starting at 0) " + i);
+            
+            // Get all the comments since there isn't a method to just get one specific comment.
             List<GHIssueComment> currentIssueComments = IssueUtils.getComments(currentIssue);
-            System.out.println("COMMENTS " + currentIssueComments.size());
-            System.out.println(currentIssueComments);
             String lastestComment;
             if (currentIssueComments.size() > 1) {
+                // Get the last comment
                 lastestComment = currentIssueComments.get(currentIssueComments.size() - 1).getBody();
-                // currentIssueComments.get(currentIssueComments.size() - 1));
             } else {
                 // There are no comments other than the issue body
                 lastestComment = currentIssue.getBody();
             }
 
             SimpleFilteredClassifier classifier = new SimpleFilteredClassifier("trainingDataModel.arff");
-            // classifier.loadModel("trainingDataModel.arff");
             Instances dataToClassify = classifier.makeInstanceInInstances(lastestComment, "resolved", "unresolved");
-            // There is just one instance because there is one comment processed at at time
 
-            // instance(0) TODO
             String classification = classifier.classify(dataToClassify);
-
             processorDB.putClassificationInDB(repo, currentIssue.getNumber(), IssueUtils.getSqlDate(currentIssue),
                     classification);
-            // TODO delete these two following lines once have more data to get classifer to
-            // work correctly
-            // processorDB.putClassificationInDB(currentIssue.getUrl(),
-            // IssueUtils.getSqlDate(currentIssue), "resolved");
-            // processorDB.putClassificationInDB(currentIssue.getUrl(),
-            // IssueUtils.getSqlDate(currentIssue), "unresolved");
-
         }
 
         ResultSet rsFromDB = processorDB.getDataFromDatabaseAsResultSet(
@@ -95,17 +78,14 @@ public class Main {
         File classificationToDisplayFile = new File(filePath);
 
         FileWriter writer = new FileWriter(classificationToDisplayFile);
-        // jsonOfDB.writeJSONString(jsonOfDB, classificationToDisplayFile);
         JSONObject wrapJsonOfDB = new JSONObject();
         wrapJsonOfDB.put("issuesArray", jsonOfDB);
         writer.write(wrapJsonOfDB.toString());
         writer.close();
 
-        // TRY WRITING TO CSV
+        // Write to CSV
         ResultSet csvRSFromDB = processorDB.getDataFromDatabaseAsResultSet(
                 " select relatedIssueUrl, classifiedIssueStatus, DATE_FORMAT(dateIssueClosed, '%Y-%m') AS dateIssueClosed from classifierResults");
-        // TODO source:
-        //
         String csvFilePath = System.getProperty("user.dir") + "/display/classificationOutput/classifications.csv";
         CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath), '\t', CSVWriter.DEFAULT_QUOTE_CHARACTER,
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);

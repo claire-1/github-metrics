@@ -11,8 +11,9 @@ import weka.core.DenseInstance;
 import weka.core.Instances;
 
 /**
- * SimpleFilteredClassifier.java: allows for classification of strings using a weka model
- * Based on https://github.com/jmgomezh/tmweka/tree/master/FilteredClassifier
+ * SimpleFilteredClassifier.java: allows for classification of strings using a
+ * weka model Based on
+ * https://github.com/jmgomezh/tmweka/tree/master/FilteredClassifier
  */
 public class SimpleFilteredClassifier {
 
@@ -28,6 +29,7 @@ public class SimpleFilteredClassifier {
 	public SimpleFilteredClassifier(String fileName) {
 		this.classifier = loadClassifierModel(fileName);
 	}
+
 	/**
 	 * This method loads the model to be used as classifier.
 	 * 
@@ -83,6 +85,7 @@ public class SimpleFilteredClassifier {
 	 */
 	public String classify(Instances unlabledDataInstance) {
 		try {
+			// There is just one instance because there is one comment processed at at time
 			double pred = classifier.classifyInstance(unlabledDataInstance.instance(0));
 			System.out.println("===== Classified instance =====");
 			System.out.println("Class predicted: " + unlabledDataInstance.classAttribute().value((int) pred));

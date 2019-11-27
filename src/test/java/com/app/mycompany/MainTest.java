@@ -8,15 +8,9 @@ import weka.core.Instances;
 
 public class MainTest {
 
+    // Classifier tests
     @Test
     public void givenTrainedClassifierShouldClassifyStringAsSpam() throws Exception {
-        // Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
-        // trainingData.setClassIndex(0); // data formatted resolved, 'some string'
-        
-        // CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
-        
-        // String classification = processor.classifyData(trainingData, "u have won the 1 lakh prize");
-
         FilteredClassifierTrainer trainer = new FilteredClassifierTrainer();
         Instances trainingData = trainer.loadDataset(MainTest.class.getResource("/trainingDataTest.arff").getFile());
         // Evaluation mus be done before training
@@ -26,7 +20,6 @@ public class MainTest {
         trainer.saveModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
         String modelFile = MainTest.class.getResource("/trainingDataModelTest.arff").getFile();
         SimpleFilteredClassifier classifier = new SimpleFilteredClassifier(modelFile);
-        //classifier.loadModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
         Instances unlabeledData = classifier.makeInstanceInInstances("u have won the 1 lakh prize", "spam", "ham");
         String classification = classifier.classify(unlabeledData);
         assertEquals("spam", classification);
@@ -34,13 +27,6 @@ public class MainTest {
 
     @Test
     public void givenTrainedClassifierShouldClassifyStringAsHam() throws Exception {
-        // Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
-        // trainingData.setClassIndex(0); // data formatted resolved, 'some string'
-        
-        // CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
-        
-        // String classification = processor.classifyData(trainingData, "how are you ?");
-
         FilteredClassifierTrainer trainer = new FilteredClassifierTrainer();
         Instances trainingData = trainer.loadDataset(MainTest.class.getResource("/trainingDataTest.arff").getFile());
         trainer.evaluate(trainingData);
@@ -48,14 +34,11 @@ public class MainTest {
         trainer.saveModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
         String modelFile = MainTest.class.getResource("/trainingDataModelTest.arff").getFile();
         SimpleFilteredClassifier classifier = new SimpleFilteredClassifier(modelFile);
-       // classifier.loadModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
         Instances unlabeledData = classifier.makeInstanceInInstances("how are you ?", "spam", "ham");
         String classification = classifier.classify(unlabeledData);
         assertEquals("ham", classification);
     }
-
-// TODO end of new tests that should work if classifier was working
-
+    // End of classifier tests
 
     // // Given a comment, put it in the database
     // @Test

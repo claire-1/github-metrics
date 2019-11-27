@@ -49,3 +49,5 @@ Source for how to use PreparedStatements in Java: https://alvinalexander.com/jav
 Source for checking return value of bash command for start.sh: https://stackoverflow.com/questions/15471264/how-to-check-if-is-not-equal-to-zero-in-unix-shell-scripting/15471312 \
 Source for how to convert ResultSet to JSON http://biercoff.com/nice-and-simple-converter-of-java-resultset-into-jsonarray-or-xml/ \
 Source for writing ResultSet to CSV http://www.codecodex.com/wiki/Write_a_SQL_result_set_to_a_comma_seperated_value_(CSV)_file \
+Source for changing Java util date to SQL date https://stackoverflow.com/questions/530012/how-to-convert-java-util-date-to-java-sql-date \
+Source for making SQL connection: https://javarevisited.blogspot.com/2016/09/javasqlsqlexception-no-suitable-driver-mysql-jdbc-localhost.html#ixzz64gKoyLbl \
