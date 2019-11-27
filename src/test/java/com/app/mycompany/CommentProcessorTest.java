@@ -41,8 +41,6 @@ public class CommentProcessorTest {
 
         MyFilteredLearner learner = new MyFilteredLearner();
         learner.loadDataset(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
-        // Evaluation mus be done before training
-        // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
         learner.evaluate();
         learner.learn();
         learner.saveModel(CommentProcessorTest.class.getResource("/trainingDataModelTest.arff").getFile());

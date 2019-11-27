@@ -12,17 +12,18 @@ import org.json.JSONObject;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 
-import weka.core.Instances;
-
 /**
- * GithubAccess: Gets info from github
+ * Main: Gets issues from readme, classifies them, writes the result to a JSON file
+ * to be displayed later.
  */
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        GithubAccess github = new GithubAccess("claire-1/github-metrics");
-        // GithubAccess github = new GithubAccess("tootsuite/mastodon");
-        // GithubAccess github = new GithubAccess("liyasthomas/postwoman");
+       // String repo = "claire-1/github-metrics";
+       // String repo = "tootsuite/mastodon";
+        String repo = "liyasthomas/postwoman";
+        GithubAccess github = new GithubAccess(repo);
+
         MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
         // TODO change this back for issue with only getting some of the issues from
         // github but not all if there are a lot
@@ -30,11 +31,10 @@ public class Main {
         // GithubAccess("tootsuite/mastodon");
         List<GHIssue> issues = github.getClosedIssues();
         // Process data to get classification
-        Instances trainingData = CommentProcessor.getDataSetFromFile("trainingData.arff");
-        trainingData.setClassIndex(0); // data formatted resolved, 'some string' TODO
-        System.out.println("TRAINING DATA " + trainingData.toString());
-
-        System.out.println("NUMBER OF ISSUES " + issues.size());
+        // Instances trainingData =
+        // CommentProcessor.getDataSetFromFile("trainingData.arff");
+        // trainingData.setClassIndex(0); // data formatted resolved, 'some string' TODO
+        // System.out.println("TRAINING DATA " + trainingData.toString());
 
         // Get the last comment for each issue
         for (int i = 0; i < issues.size(); i++) {
@@ -63,10 +63,10 @@ public class Main {
             // lastestComment);
 
             MyFilteredLearner learner = new MyFilteredLearner();
-			learner.loadDataset("trainingData.arff");
-			// Evaluation mus be done before training
-			// More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
-			learner.evaluate();
+            learner.loadDataset("trainingData.arff");
+            // Evaluation mus be done before training
+            // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
+            learner.evaluate();
             learner.learn();
             learner.saveModel("trainingDataModel.arff");
             MyFilteredClassifier classifier = new MyFilteredClassifier();
@@ -74,14 +74,13 @@ public class Main {
             classifier.loadModel("trainingDataModel.arff");
             classifier.makeInstance(lastestComment, "resolved", "unresolved");
             String classification = classifier.classify();
-	// 		classifier.loadModel(args[1]);
-	// 		classifier.makeInstance();
-	// 		classifier.classify();
-
+            // classifier.loadModel(args[1]);
+            // classifier.makeInstance();
+            // classifier.classify();
 
             // System.out.println("classification " + classification);
 
-            processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue),
+            processorDB.putClassificationInDB(repo, currentIssue.getNumber(), IssueUtils.getSqlDate(currentIssue),
                     classification);
             // TODO delete these two following lines once have more data to get classifer to
             // work correctly
@@ -95,7 +94,7 @@ public class Main {
         ResultSet rsFromDB = processorDB.getDataFromDatabaseAsResultSet(
                 " select DATE_FORMAT(dateIssueClosed, '%Y-%m') AS dateIssueClosed, SUM(CASE WHEN classifiedIssueStatus=\'unresolved\' THEN 1 ELSE 0 END) as numberIssuesUnresolved, SUM(CASE WHEN classifiedIssueStatus=\'resolved\' THEN 1 ELSE 0 END) as numberIssuesResolved from classifierResults GROUP BY DATE_FORMAT(dateIssueClosed, '%Y-%m') ORDER BY dateIssueClosed");
 
-        JSONArray jsonOfDB = CommentProcessor.convertToJSON(rsFromDB);
+        JSONArray jsonOfDB = ResultSetUtils.convertToJSON(rsFromDB);
         System.out.println("JSON " + jsonOfDB.toString());
 
         String filePath = System.getProperty("user.dir") + "/display/php/classifications.json";
