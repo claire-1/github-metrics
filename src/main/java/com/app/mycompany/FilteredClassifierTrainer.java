@@ -1,20 +1,8 @@
 package com.app.mycompany;
 
-/**
- * A Java class that implements a simple text learner, based on WEKA.
- * To be used with MyFilteredClassifier.java.
- * WEKA is available at: http://www.cs.waikato.ac.nz/ml/weka/
- * Copyright (C) 2013 Jose Maria Gomez Hidalgo - http://www.esp.uem.es/jmgomez
- *
- * This program is free software: you can redistribute it and/or modify
- * it for any purpose.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * 
- * 
- * TODO source: https://github.com/jmgomezh/tmweka/blob/master/FilteredClassifier/MyFilteredLearner.java
+/*
+ * FilteredClassifierTrainer.java: Train a basic weka classifier in Java.
+ * Based on https://github.com/jmgomezh/tmweka/tree/master/FilteredClassifier
  */
 
 import java.io.BufferedReader;
@@ -42,10 +30,6 @@ import weka.filters.unsupervised.attribute.StringToWordVector;
 public class FilteredClassifierTrainer {
 
     /**
-     * Object that stores training data.
-     */
-    Instances trainData;
-    /**
      * Object that stores the filter
      */
     StringToWordVector filter;
@@ -54,22 +38,28 @@ public class FilteredClassifierTrainer {
      */
     FilteredClassifier classifier;
 
+    public FilteredClassifierTrainer() {
+        this.filter = new StringToWordVector();
+        this.filter.setAttributeIndices("last");
+        this.classifier = new FilteredClassifier();
+        this.classifier.setFilter(this.filter);
+        this.classifier.setClassifier(new NaiveBayes());
+    }
+
     /**
      * This method loads a dataset in ARFF format. If the file does not exist, or it
      * has a wrong format, the attribute trainData is null.
      * 
      * @param fileName The name of the file that stores the dataset.
      */
-    // public MyFilteredLearner(String trainingData) {
-
-    // }
     public Instances loadDataset(String fileName) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             ArffReader arff = new ArffReader(reader);
-            trainData = arff.getData();
+            Instances trainData = arff.getData();
             System.out.println("===== Loaded dataset: " + fileName + " =====");
             reader.close();
+            trainData.setClassIndex(0);
             return trainData;
         } catch (IOException e) {
             throw new RuntimeException("loadDataset|error when reading " + fileName, e);
@@ -81,16 +71,10 @@ public class FilteredClassifierTrainer {
      * the classifier is defined but not trained yet. Evaluation of previously
      * trained classifiers can lead to unexpected results.
      */
-    public void evaluate() {
+    public void evaluate(Instances trainingData) {
         try {
-            trainData.setClassIndex(0);
-            filter = new StringToWordVector();
-            filter.setAttributeIndices("last");
-            classifier = new FilteredClassifier();
-            classifier.setFilter(filter);
-            classifier.setClassifier(new NaiveBayes());
-            Evaluation eval = new Evaluation(trainData);
-            eval.crossValidateModel(classifier, trainData, 4, new Random(1));
+            Evaluation eval = new Evaluation(trainingData);
+            eval.crossValidateModel(classifier, trainingData, 4, new Random(1));
             System.out.println(eval.toSummaryString());
             System.out.println(eval.toClassDetailsString());
             System.out.println("===== Evaluating on filtered (training) dataset done =====");
@@ -102,15 +86,15 @@ public class FilteredClassifierTrainer {
     /**
      * This method trains the classifier on the loaded dataset.
      */
-    public void learn() {
+    public void trainClassifier(Instances trainingData) {
         try {
-            trainData.setClassIndex(0);
+            trainingData.setClassIndex(0);
             filter = new StringToWordVector();
             filter.setAttributeIndices("last");
             classifier = new FilteredClassifier();
             classifier.setFilter(filter);
             classifier.setClassifier(new NaiveBayes());
-            classifier.buildClassifier(trainData);
+            classifier.buildClassifier(trainingData);
             // Uncomment to see the classifier
             // System.out.println(classifier);
             System.out.println("===== Training on filtered (training) dataset done =====");
@@ -132,7 +116,7 @@ public class FilteredClassifierTrainer {
             out.close();
             System.out.println("===== Saved model: " + fileName + " =====");
         } catch (IOException e) {
-            System.out.println("Problem found when writing: " + fileName);
+            throw new RuntimeException("saveModel|error when writing to " + fileName, e);
         }
     }
 }

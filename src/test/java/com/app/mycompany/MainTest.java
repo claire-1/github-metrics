@@ -21,13 +21,14 @@ public class MainTest {
         Instances trainingData = trainer.loadDataset(MainTest.class.getResource("/trainingDataTest.arff").getFile());
         // Evaluation mus be done before training
         // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
-        trainer.evaluate();
-        trainer.learn();
+        trainer.evaluate(trainingData);
+        trainer.trainClassifier(trainingData);
         trainer.saveModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
-        SimpleFilteredClassifier classifier = new SimpleFilteredClassifier();
-        classifier.loadModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
-        classifier.makeInstance("u have won the 1 lakh prize", "spam", "ham");
-        String classification = classifier.classify();
+        String modelFile = MainTest.class.getResource("/trainingDataModelTest.arff").getFile();
+        SimpleFilteredClassifier classifier = new SimpleFilteredClassifier(modelFile);
+        //classifier.loadModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
+        Instances unlabeledData = classifier.makeInstanceInInstances("u have won the 1 lakh prize", "spam", "ham");
+        String classification = classifier.classify(unlabeledData);
         assertEquals("spam", classification);
     }
 
@@ -42,13 +43,14 @@ public class MainTest {
 
         FilteredClassifierTrainer trainer = new FilteredClassifierTrainer();
         Instances trainingData = trainer.loadDataset(MainTest.class.getResource("/trainingDataTest.arff").getFile());
-        trainer.evaluate();
-        trainer.learn();
+        trainer.evaluate(trainingData);
+        trainer.trainClassifier(trainingData);
         trainer.saveModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
-        SimpleFilteredClassifier classifier = new SimpleFilteredClassifier();
-        classifier.loadModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
-        classifier.makeInstance("how are you ?", "spam", "ham");
-        String classification = classifier.classify();
+        String modelFile = MainTest.class.getResource("/trainingDataModelTest.arff").getFile();
+        SimpleFilteredClassifier classifier = new SimpleFilteredClassifier(modelFile);
+       // classifier.loadModel(MainTest.class.getResource("/trainingDataModelTest.arff").getFile());
+        Instances unlabeledData = classifier.makeInstanceInInstances("how are you ?", "spam", "ham");
+        String classification = classifier.classify(unlabeledData);
         assertEquals("ham", classification);
     }
 

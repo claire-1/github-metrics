@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 
-import weka.core.Instance;
 import weka.core.Instances;
 
 /**
@@ -43,8 +42,8 @@ public class Main {
         Instances trainingData = trainer.loadDataset("trainingData.arff");
         // Evaluation mus be done before training
         // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
-        trainer.evaluate();
-        trainer.learn();
+        trainer.evaluate(trainingData);
+        trainer.trainClassifier(trainingData);
         trainer.saveModel("trainingDataModel.arff");
         // Get the last comment for each issue
         for (int i = 0; i < issues.size(); i++) {
@@ -66,13 +65,13 @@ public class Main {
                 lastestComment = currentIssue.getBody();
             }
 
-            SimpleFilteredClassifier classifier = new SimpleFilteredClassifier();
-            classifier.loadModel("trainingDataModel.arff");
-            Instance dataToClassify = classifier.makeInstance(lastestComment, "resolved", "unresolved");
+            SimpleFilteredClassifier classifier = new SimpleFilteredClassifier("trainingDataModel.arff");
+            //classifier.loadModel("trainingDataModel.arff");
+            Instances dataToClassify = classifier.makeInstanceInInstances(lastestComment, "resolved", "unresolved");
             // There is just one instance because there is one comment processed at at time
 
             // instance(0) TODO
-            String classification = classifier.classify(); 
+            String classification = classifier.classify(dataToClassify); 
 
             processorDB.putClassificationInDB(repo, currentIssue.getNumber(), IssueUtils.getSqlDate(currentIssue),
                     classification);
