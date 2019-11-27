@@ -23,7 +23,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         String repo = "claire-1/github-metrics";
         // String repo = "tootsuite/mastodon";
-        //String repo = "liyasthomas/postwoman";
+        // String repo = "liyasthomas/postwoman";
         GithubAccess github = new GithubAccess(repo);
 
         MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
@@ -66,12 +66,12 @@ public class Main {
             }
 
             SimpleFilteredClassifier classifier = new SimpleFilteredClassifier("trainingDataModel.arff");
-            //classifier.loadModel("trainingDataModel.arff");
+            // classifier.loadModel("trainingDataModel.arff");
             Instances dataToClassify = classifier.makeInstanceInInstances(lastestComment, "resolved", "unresolved");
             // There is just one instance because there is one comment processed at at time
 
             // instance(0) TODO
-            String classification = classifier.classify(dataToClassify); 
+            String classification = classifier.classify(dataToClassify);
 
             processorDB.putClassificationInDB(repo, currentIssue.getNumber(), IssueUtils.getSqlDate(currentIssue),
                     classification);
@@ -90,7 +90,7 @@ public class Main {
         JSONArray jsonOfDB = ResultSetUtils.convertToJSON(rsFromDB);
         System.out.println("JSON " + jsonOfDB.toString());
 
-        String filePath = System.getProperty("user.dir") + "/display/php/classifications.json";
+        String filePath = System.getProperty("user.dir") + "/display/classificationOutput/classifications.json";
         System.out.println("FILE PATH " + filePath);
         File classificationToDisplayFile = new File(filePath);
 
@@ -105,8 +105,8 @@ public class Main {
         ResultSet csvRSFromDB = processorDB.getDataFromDatabaseAsResultSet(
                 " select relatedIssueUrl, classifiedIssueStatus, DATE_FORMAT(dateIssueClosed, '%Y-%m') AS dateIssueClosed from classifierResults");
         // TODO source:
-        // http://www.codecodex.com/wiki/Write_a_SQL_result_set_to_a_comma_seperated_value_(CSV)_file
-        String csvFilePath = System.getProperty("user.dir") + "/display/php/classifications.csv";
+        //
+        String csvFilePath = System.getProperty("user.dir") + "/display/classificationOutput/classifications.csv";
         CSVWriter csvWriter = new CSVWriter(new FileWriter(csvFilePath), '\t', CSVWriter.DEFAULT_QUOTE_CHARACTER,
                 CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
 

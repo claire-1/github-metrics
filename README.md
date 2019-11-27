@@ -34,6 +34,8 @@ Example arff file for training data http://users.eecs.northwestern.edu/~ahu340/e
 package.json file needed to init npm from: https://github.com/yyx990803/npm-http-server/blob/master/package.json \
 Source for how to use Naive Bayes from Weka in Java: https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes \
 
+For displaying a simple graph with d3: download file D3-Tips-and-Tricks-3902-extras/d3jscodesamples/13/simple-graph.html from http://www.d3noob.org/2013/02/using-mysql-database-as-source-of-data.html  \
+
 Sources for query to get classification results: \
 https://stackoverflow.com/questions/14565788/how-to-group-by-month-from-date-field-using-sql \
 https://stackoverflow.com/questions/53848520/group-by-several-columns-with-count-on-another-column-sql-server \
@@ -46,3 +48,4 @@ Weka and getting Instances from SQL database: https://waikato.github.io/weka-wik
 Source for how to use PreparedStatements in Java: https://alvinalexander.com/java/java-mysql-insert-example-preparedstatement \
 Source for checking return value of bash command for start.sh: https://stackoverflow.com/questions/15471264/how-to-check-if-is-not-equal-to-zero-in-unix-shell-scripting/15471312 \
 Source for how to convert ResultSet to JSON http://biercoff.com/nice-and-simple-converter-of-java-resultset-into-jsonarray-or-xml/ \
+Source for writing ResultSet to CSV http://www.codecodex.com/wiki/Write_a_SQL_result_set_to_a_comma_seperated_value_(CSV)_file \
