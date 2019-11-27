@@ -12,16 +12,19 @@ import org.json.JSONObject;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 
+import weka.core.Instance;
+import weka.core.Instances;
+
 /**
- * Main: Gets issues from readme, classifies them, writes the result to a JSON file
- * to be displayed later.
+ * Main: Gets issues from readme, classifies them, writes the result to a JSON
+ * file to be displayed later.
  */
 public class Main {
 
     public static void main(String[] args) throws Exception {
-       // String repo = "claire-1/github-metrics";
-       // String repo = "tootsuite/mastodon";
-        String repo = "liyasthomas/postwoman";
+        String repo = "claire-1/github-metrics";
+        // String repo = "tootsuite/mastodon";
+        //String repo = "liyasthomas/postwoman";
         GithubAccess github = new GithubAccess(repo);
 
         MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
@@ -36,6 +39,13 @@ public class Main {
         // trainingData.setClassIndex(0); // data formatted resolved, 'some string' TODO
         // System.out.println("TRAINING DATA " + trainingData.toString());
 
+        FilteredClassifierTrainer trainer = new FilteredClassifierTrainer();
+        Instances trainingData = trainer.loadDataset("trainingData.arff");
+        // Evaluation mus be done before training
+        // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
+        trainer.evaluate();
+        trainer.learn();
+        trainer.saveModel("trainingDataModel.arff");
         // Get the last comment for each issue
         for (int i = 0; i < issues.size(); i++) {
             GHIssue currentIssue = issues.get(i);
@@ -55,30 +65,14 @@ public class Main {
                 // There are no comments other than the issue body
                 lastestComment = currentIssue.getBody();
             }
-            // IssueUtils.getSqlDate(currentIssue), lastestComment);
 
-            // CommentProcessor commentProcessor = new CommentProcessor(trainingData,
-            // "resolved", "unresolved");
-            // String classification = commentProcessor.classifyData(trainingData,
-            // lastestComment);
-
-            MyFilteredLearner learner = new MyFilteredLearner();
-            learner.loadDataset("trainingData.arff");
-            // Evaluation mus be done before training
-            // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
-            learner.evaluate();
-            learner.learn();
-            learner.saveModel("trainingDataModel.arff");
-            MyFilteredClassifier classifier = new MyFilteredClassifier();
-            classifier.load("trainingData.arff");
+            SimpleFilteredClassifier classifier = new SimpleFilteredClassifier();
             classifier.loadModel("trainingDataModel.arff");
-            classifier.makeInstance(lastestComment, "resolved", "unresolved");
-            String classification = classifier.classify();
-            // classifier.loadModel(args[1]);
-            // classifier.makeInstance();
-            // classifier.classify();
+            Instance dataToClassify = classifier.makeInstance(lastestComment, "resolved", "unresolved");
+            // There is just one instance because there is one comment processed at at time
 
-            // System.out.println("classification " + classification);
+            // instance(0) TODO
+            String classification = classifier.classify(); 
 
             processorDB.putClassificationInDB(repo, currentIssue.getNumber(), IssueUtils.getSqlDate(currentIssue),
                     classification);

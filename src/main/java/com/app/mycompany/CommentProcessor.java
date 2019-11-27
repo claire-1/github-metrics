@@ -1,15 +1,9 @@
 package com.app.mycompany;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import weka.classifiers.bayes.NaiveBayesMultinomial;
-import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Attribute;
-import weka.core.Instances;
-import weka.core.tokenizers.NGramTokenizer;
-import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class CommentProcessor {
 
@@ -17,72 +11,72 @@ public class CommentProcessor {
     // private FilteredClassifier classifier;
     private FilteredClassifier classifier;
 
-    public CommentProcessor(Instances trainingData, String attributeLabel1, String attributeLabel2) throws Exception {
+    // public CommentProcessor(Instances trainingData, String attributeLabel1, String attributeLabel2) throws Exception {
 
-        classifier = new FilteredClassifier();
+    //     classifier = new FilteredClassifier();
 
-        StringToWordVector filter = new StringToWordVector();
-        trainingData.setClassIndex(0);
-        // TODO source about filer
-        // http://jmgomezhidalgo.blogspot.com/2013/06/sample-code-for-text-indexing-with-weka.html
-        filter.setInputFormat(trainingData);
-        filter.setLowerCaseTokens(true);
-        filter.setWordsToKeep(1000000);
-        filter.setDoNotOperateOnPerClassBasis(true);
-        filter.setAttributeIndices("last");
-        // // add ngram tokenizer to filter with min and max length set to 1
-        NGramTokenizer tokenizer = new NGramTokenizer();
-        tokenizer.setNGramMinSize(1);
-        tokenizer.setNGramMaxSize(1);
-        // use word delimeter
-        tokenizer.setDelimiters("\\W");
-        filter.setTokenizer(tokenizer);
-        // set Multinomial NaiveBayes as arbitrary classifier
-        classifier.setClassifier(new NaiveBayesMultinomial());
+    //     StringToWordVector filter = new StringToWordVector();
+    //     trainingData.setClassIndex(0);
+    //     // TODO source about filer
+    //     // http://jmgomezhidalgo.blogspot.com/2013/06/sample-code-for-text-indexing-with-weka.html
+    //     filter.setInputFormat(trainingData);
+    //     filter.setLowerCaseTokens(true);
+    //     filter.setWordsToKeep(1000000);
+    //     filter.setDoNotOperateOnPerClassBasis(true);
+    //     filter.setAttributeIndices("last");
+    //     // // add ngram tokenizer to filter with min and max length set to 1
+    //     NGramTokenizer tokenizer = new NGramTokenizer();
+    //     tokenizer.setNGramMinSize(1);
+    //     tokenizer.setNGramMaxSize(1);
+    //     // use word delimeter
+    //     tokenizer.setDelimiters("\\W");
+    //     filter.setTokenizer(tokenizer);
+    //     // set Multinomial NaiveBayes as arbitrary classifier
+    //     classifier.setClassifier(new NaiveBayesMultinomial());
 
-        // this.classifier = new NaiveBayesMultinomial();
-        classifier.buildClassifier(trainingData);
-        Evaluation eval = new Evaluation(trainingData);
-        eval.evaluateModel(classifier, trainingData);
-        System.out.println("** Naive Bayes Evaluation with Datasets **");
-        System.out.println(eval.toSummaryString());
-        System.out.println(classifier);
-        Thread.sleep(5000);
+    //     // this.classifier = new NaiveBayesMultinomial();
+    //     classifier.buildClassifier(trainingData);
+    //     Evaluation eval = new Evaluation(trainingData);
+    //     eval.evaluateModel(classifier, trainingData);
+    //     System.out.println("** Naive Bayes Evaluation with Datasets **");
+    //     System.out.println(eval.toSummaryString());
+    //     System.out.println(classifier);
+    //     Thread.sleep(5000);
 
-        // TODO need filter?
-        // create the filter and set the attribute to be transformed from text into a
-        // feature vector (the last one)
-        // StringToWordVector filter = new StringToWordVector();
-        // filter.setAttributeIndices("last");
+    //     // TODO need filter?
+    //     // create the filter and set the attribute to be transformed from text into a
+    //     // feature vector (the last one)
+    //     // StringToWordVector filter = new StringToWordVector();
+    //     // filter.setAttributeIndices("last");
 
-        // // add ngram tokenizer to filter with min and max length set to 1
-        // NGramTokenizer tokenizer = new NGramTokenizer();
-        // tokenizer.setNGramMinSize(1);
-        // tokenizer.setNGramMaxSize(1);
-        // // use word delimeter
-        // tokenizer.setDelimiters("\\W");
-        // filter.setTokenizer(tokenizer);
+    //     // // add ngram tokenizer to filter with min and max length set to 1
+    //     // NGramTokenizer tokenizer = new NGramTokenizer();
+    //     // tokenizer.setNGramMinSize(1);
+    //     // tokenizer.setNGramMaxSize(1);
+    //     // // use word delimeter
+    //     // tokenizer.setDelimiters("\\W");
+    //     // filter.setTokenizer(tokenizer);
 
-        // // convert tokens to lowercase
-        // filter.setLowerCaseTokens(true);
+    //     // // convert tokens to lowercase
+    //     // filter.setLowerCaseTokens(true);
 
-        // // add filter to classifier
-        // classifier.setFilter(filter);
+    //     // // add filter to classifier
+    //     // classifier.setFilter(filter);
 
-        // Declare text attribute to hold the message for the Instance
-        Attribute attributeText = new Attribute("text", (List<String>) null);
+    //     // Declare text attribute to hold the message for the Instance
+    //     Attribute attributeText = new Attribute("text", (List<String>) null);
 
-        // Declare the label attribute along with its values
-        ArrayList<String> classAttributeValues = new ArrayList<>();
-        classAttributeValues.add(attributeLabel1);
-        classAttributeValues.add(attributeLabel2);
-        Attribute classAttribute = new Attribute("label", classAttributeValues);
+    //     // Declare the label attribute along with its values
+    //     ArrayList<String> classAttributeValues = new ArrayList<>();
+    //     classAttributeValues.add(attributeLabel1);
+    //     classAttributeValues.add(attributeLabel2);
+    //     Attribute classAttribute = new Attribute("label", classAttributeValues);
 
-        // Declare the feature vector
-        this.wekaAttributes = new ArrayList<>();
-        this.wekaAttributes.add(classAttribute);
-        this.wekaAttributes.add(attributeText);
-    }
+    //     // Declare the feature vector
+    //     this.wekaAttributes = new ArrayList<>();
+    //     this.wekaAttributes.add(classAttribute);
+    //     this.wekaAttributes.add(attributeText);
+    // }
 
     // To use for training data in arff file
     // public static Instances getDataSetFromFile(String filename) {

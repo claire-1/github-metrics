@@ -9,7 +9,7 @@ As of commit 28baed9d3c4b461f8fa2ae6dc12bd5f5d88550c4, I can access Github throu
 
 ## Github Access demos
 This gif shows the data as displayed by `bubble.html.` It has a different color for resolved and unresolved issues and displays links to more details about the issues when you hover over the bubbles. \
-![gif of bubble page](demo/bubbleTest.gif)
+![gif of bubble page](demo/bubbleChart.gif)
 \
 Image of bar chart produced by `bar-chart.html.` It has a different color for resolved and unresolved issues and groups the issues by month and year. \
 ![image of bar chart](demo/barChartTest.png)
@@ -21,7 +21,12 @@ Example output from getting all the issues associated with this repository at th
 [GHIssue@3f577e31[assignee=<null>,assignees={},state=closed,number=1,comments=1,labels=[],title=WIP test comment title,milestone=<null>,locked=false,responseHeaderFields={null=[HTTP/1.1 200 OK], X-Accepted-OAuth-Scopes=[repo], Server=[GitHub.com], Access-Control-Allow-Origin=[*], Referrer-Policy=[origin-when-cross-origin, strict-origin-when-cross-origin], X-Frame-Options=[deny], Strict-Transport-Security=[max-age=31536000; includeSubdomains; preload], Access-Control-Expose-Headers=[ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type], X-RateLimit-Remaining=[4892], X-GitHub-Media-Type=[unknown, github.v3], Content-Security-Policy=[default-src 'none'], Content-Encoding=[gzip], X-XSS-Protection=[1; mode=block], X-GitHub-Request-Id=[FACA:AA07:5A08524:6C41D99:5DC18420], Content-Type=[application/json; charset=utf-8], Status=[200 OK], Transfer-Encoding=[chunked], X-Content-Type-Options=[nosniff], X-RateLimit-Reset=[1572966946], Date=[Tue, 05 Nov 2019 14:16:01 GMT], Cache-Control=[private, max-age=60, s-maxage=60], ETag=[W/"b3a1298eec4b8d416de012fa9207c3b6"], Vary=[Accept-Encoding, Accept, Authorization, Cookie, X-GitHub-OTP], X-RateLimit-Limit=[5000], X-OAuth-Scopes=[]},url=https://api.github.com/repos/claire-1/github-metrics/issues/1,id=516898487]]
 `
 ## Souces
+### Very Important Sources
 Java Github API: https://github.com/github-api/github-api \
+Source for bubble chart: https://www.freecodecamp.org/news/a-gentle-introduction-to-d3-how-to-build-a-reusable-bubble-chart-9106dc4f6c46/ and https://github.com/dmesquita/reusable_bubble_chart \
+Source for working classification: based on this tutorial http://jmgomezhidalgo.blogspot.com/2013/04/a-simple-text-classifier-in-java-with.html with this repo https://github.com/jmgomezh/tmweka/tree/master/FilteredClassifier \
+
+### Other Important Sources
 About how to get a Github OAuth token: https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line \
 About how to specify Github OAuth token as an environment variable: https://issues.jenkins-ci.org/browse/JENKINS-37581 \
 About how to execute Java with maven: https://stackoverflow.com/questions/18011494/failed-to-execute-goal-org-codehaus-mojoexec-maven-plugin1-2java-default-cli \
@@ -40,4 +45,4 @@ Source for dealing with ResultSets: https://www.javatpoint.com/example-to-connec
 Weka and getting Instances from SQL database: https://waikato.github.io/weka-wiki/use_weka_in_your_java_code/ \
 Source for how to use PreparedStatements in Java: https://alvinalexander.com/java/java-mysql-insert-example-preparedstatement \
 Source for checking return value of bash command for start.sh: https://stackoverflow.com/questions/15471264/how-to-check-if-is-not-equal-to-zero-in-unix-shell-scripting/15471312 \
-Source for bubble chart: https://www.freecodecamp.org/news/a-gentle-introduction-to-d3-how-to-build-a-reusable-bubble-chart-9106dc4f6c46/ and https://github.com/dmesquita/reusable_bubble_chart \
+Source for how to convert ResultSet to JSON http://biercoff.com/nice-and-simple-converter-of-java-resultset-into-jsonarray-or-xml/ \

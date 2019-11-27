@@ -49,13 +49,10 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <!-- <classpathScope>main</classpathScope> -->
                     <mainClass>com.app.mycompany.Main</mainClass>
                 </configuration>
                 <executions>
                     <execution>
-                        <!-- <id>run-selenium</id>
-                        <phase>integration-test</phase> -->
                         <goals>
                             <goal>java</goal>
                         </goals>

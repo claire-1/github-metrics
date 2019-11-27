@@ -1,6 +1,5 @@
 package com.app.mycompany;
 
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -58,8 +57,6 @@ public class MySqlConnection {
         }
     }
 
-   
-
     // TODO delete this probably
     public String getDataFromDatabase(String query) throws SQLException { // TODO this is just for testing for now
         // Source for dealing with ResultSets:
@@ -107,11 +104,13 @@ public class MySqlConnection {
         preparedStatement.execute();
     }
 
-    public void putClassificationInDB(URL issueUrl, Date issueClosedDate, String classification) throws SQLException {
+    public void putClassificationInDB(String repo, int issueNumber, Date issueClosedDate, String classification)
+            throws SQLException {
+        String urlToGithubIssue = "https://github.com/" + repo + "/issues/" + issueNumber;
         String query = " insert into classifierResults (relatedIssueUrl, dateIssueClosed, classifiedIssueStatus)"
                 + " values (?, ?, ?)";
         PreparedStatement preparedStmt = conn.prepareStatement(query);
-        preparedStmt.setURL(1, issueUrl);
+        preparedStmt.setString(1, urlToGithubIssue);
         preparedStmt.setDate(2, issueClosedDate);
         preparedStmt.setString(3, classification);
         // execute the query
