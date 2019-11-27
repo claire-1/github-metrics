@@ -15,31 +15,52 @@ import org.json.JSONObject;
 
 import weka.classifiers.bayes.NaiveBayesMultinomial;
 import weka.classifiers.evaluation.Evaluation;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
+import weka.core.tokenizers.NGramTokenizer;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.StringToWordVector;
 
 public class CommentProcessor {
 
     private ArrayList<Attribute> wekaAttributes;
-   // private FilteredClassifier classifier;
-   private NaiveBayesMultinomial classifier;
+    // private FilteredClassifier classifier;
+    private FilteredClassifier classifier;
 
     public CommentProcessor(Instances trainingData, String attributeLabel1, String attributeLabel2) throws Exception {
-        this.classifier = new NaiveBayesMultinomial();
+       
+        classifier = new FilteredClassifier();
+
+        StringToWordVector filter = new StringToWordVector();
+        trainingData.setClassIndex(0); 
+            // TODO source about filer http://jmgomezhidalgo.blogspot.com/2013/06/sample-code-for-text-indexing-with-weka.html
+            filter.setInputFormat(trainingData);
+            filter.setLowerCaseTokens(true);
+            filter.setWordsToKeep(1000000);
+            filter.setDoNotOperateOnPerClassBasis(true);
+            filter.setAttributeIndices("last"); 
+            // // add ngram tokenizer to filter with min and max length set to 1
+            NGramTokenizer tokenizer = new NGramTokenizer();
+            tokenizer.setNGramMinSize(1);
+            tokenizer.setNGramMaxSize(1);
+            // use word delimeter
+            tokenizer.setDelimiters("\\W");
+            filter.setTokenizer(tokenizer);
+        // set Multinomial NaiveBayes as arbitrary classifier
+        classifier.setClassifier(new NaiveBayesMultinomial());
+       
+       // this.classifier = new NaiveBayesMultinomial();
         classifier.buildClassifier(trainingData);
         Evaluation eval = new Evaluation(trainingData);
         eval.evaluateModel(classifier, trainingData);
         System.out.println("** Naive Bayes Evaluation with Datasets **");
         System.out.println(eval.toSummaryString());
         System.out.println(classifier);
-        //classifier = new FilteredClassifier();
-
-        // set Multinomial NaiveBayes as arbitrary classifier
-       // classifier.setClassifier(new NaiveBayesMultinomial());
+        Thread.sleep(5000);
+       
 
         // TODO need filter?
         // create the filter and set the attribute to be transformed from text into a
@@ -91,14 +112,15 @@ public class CommentProcessor {
         return jsonArray;
     }
 
-     // To use for training data in arff file
-     public static Instances getDataSetFromFile(String filename) {
+    // To use for training data in arff file
+    public static Instances getDataSetFromFile(String filename) {
         // TODO Taken from source:
         // https://www.codingame.com/playgrounds/6734/machine-learning-with-java---part-5-naive-bayes
 
-        StringToWordVector filter = new StringToWordVector();
-        ArffLoader loader = new ArffLoader();
+        
         try {
+            
+        ArffLoader loader = new ArffLoader();
             File fileOfData = new File(filename);
             InputStream dataStream = new FileInputStream(fileOfData);
             loader.setSource(dataStream);
@@ -106,8 +128,24 @@ public class CommentProcessor {
             Instances dataSet = loader.getDataSet();
             // TODO explaination of class index source:
             // https://stackoverflow.com/questions/26734189/what-is-class-index-in-weka
-            dataSet.setClassIndex(dataSet.numAttributes() - 1);
+            // dataSet.setClassIndex(dataSet.numAttributes() - 1);
+            dataSet.setClassIndex(0);
+
+            StringToWordVector filter = new StringToWordVector();
+            // TODO source about filer http://jmgomezhidalgo.blogspot.com/2013/06/sample-code-for-text-indexing-with-weka.html
             filter.setInputFormat(dataSet);
+            filter.setLowerCaseTokens(true);
+            filter.setWordsToKeep(1000000);
+            filter.setDoNotOperateOnPerClassBasis(true);
+            filter.setAttributeIndices("last"); 
+            // // add ngram tokenizer to filter with min and max length set to 1
+            NGramTokenizer tokenizer = new NGramTokenizer();
+            tokenizer.setNGramMinSize(1);
+            tokenizer.setNGramMaxSize(1);
+            // use word delimeter
+            tokenizer.setDelimiters("\\W");
+            filter.setTokenizer(tokenizer);
+
             dataSet = Filter.useFilter(dataSet, filter);
             return dataSet;
         } catch (IOException e) {
@@ -127,6 +165,15 @@ public class CommentProcessor {
         Instances newDataset = new Instances("predictiondata", wekaAttributes, 1);
         newDataset.setClassIndex(0); // makes data look like: resolved, 'some text'
         filter.setInputFormat(newDataset);
+        filter.setLowerCaseTokens(true);
+        filter.setWordsToKeep(1000000);
+        filter.setDoNotOperateOnPerClassBasis(true);
+        NGramTokenizer tokenizer = new NGramTokenizer();
+        tokenizer.setNGramMinSize(1);
+        tokenizer.setNGramMaxSize(1);
+        // use word delimeter
+        tokenizer.setDelimiters("\\W");
+        filter.setTokenizer(tokenizer);
         newDataset = Filter.useFilter(newDataset, filter);
 
         DenseInstance newInstance = new DenseInstance(numAttributesFromArff);
@@ -140,7 +187,6 @@ public class CommentProcessor {
 
         return newDataset.classAttribute().value((int) pred);
     }
-
 
     // public String classifyData(Instances trainingData, Instances
     // dataToBeClassified) throws Exception {

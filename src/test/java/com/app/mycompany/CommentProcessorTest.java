@@ -4,29 +4,53 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import weka.core.Instances;
-
 public class CommentProcessorTest {
 
     @Test
     public void givenTrainedClassifierShouldClassifyStringAsSpam() throws Exception {
-        Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
-        trainingData.setClassIndex(0); // data formatted resolved, 'some string'
+        // Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        // trainingData.setClassIndex(0); // data formatted resolved, 'some string'
         
-        CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
+        // CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
         
-        String classification = processor.classifyData(trainingData, "u have won the 1 lakh prize");
+        // String classification = processor.classifyData(trainingData, "u have won the 1 lakh prize");
+
+        MyFilteredLearner learner = new MyFilteredLearner();
+        learner.loadDataset(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        // Evaluation mus be done before training
+        // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
+        learner.evaluate();
+        learner.learn();
+        learner.saveModel(CommentProcessorTest.class.getResource("/trainingDataModelTest.arff").getFile());
+        MyFilteredClassifier classifier = new MyFilteredClassifier();
+        classifier.load(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        classifier.loadModel(CommentProcessorTest.class.getResource("/trainingDataModelTest.arff").getFile());
+        classifier.makeInstance("u have won the 1 lakh prize", "spam", "ham");
+        String classification = classifier.classify();
         assertEquals("spam", classification);
     }
 
     @Test
     public void givenTrainedClassifierShouldClassifyStringAsHam() throws Exception {
-        Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
-        trainingData.setClassIndex(0); // data formatted resolved, 'some string'
+        // Instances trainingData = CommentProcessor.getDataSetFromFile(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        // trainingData.setClassIndex(0); // data formatted resolved, 'some string'
         
-        CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
+        // CommentProcessor processor = new CommentProcessor(trainingData, "spam", "ham");
         
-        String classification = processor.classifyData(trainingData, "how are you ?");
+        // String classification = processor.classifyData(trainingData, "how are you ?");
+
+        MyFilteredLearner learner = new MyFilteredLearner();
+        learner.loadDataset(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        // Evaluation mus be done before training
+        // More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
+        learner.evaluate();
+        learner.learn();
+        learner.saveModel(CommentProcessorTest.class.getResource("/trainingDataModelTest.arff").getFile());
+        MyFilteredClassifier classifier = new MyFilteredClassifier();
+        classifier.load(CommentProcessorTest.class.getResource("/trainingDataTest.arff").getFile());
+        classifier.loadModel(CommentProcessorTest.class.getResource("/trainingDataModelTest.arff").getFile());
+        classifier.makeInstance("how are you ?", "spam", "ham");
+        String classification = classifier.classify();
         assertEquals("ham", classification);
     }
 

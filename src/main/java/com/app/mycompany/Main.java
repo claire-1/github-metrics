@@ -20,9 +20,9 @@ import weka.core.Instances;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        //GithubAccess github = new GithubAccess("claire-1/github-metrics");
+        GithubAccess github = new GithubAccess("claire-1/github-metrics");
         // GithubAccess github = new GithubAccess("tootsuite/mastodon");
-        GithubAccess github = new GithubAccess("liyasthomas/postwoman");
+        // GithubAccess github = new GithubAccess("liyasthomas/postwoman");
         MySqlConnection processorDB = new MySqlConnection("comments-sql-db:3306", "storage", "root");
         // TODO change this back for issue with only getting some of the issues from
         // github but not all if there are a lot
@@ -57,16 +57,38 @@ public class Main {
             }
             // IssueUtils.getSqlDate(currentIssue), lastestComment);
 
-            CommentProcessor commentProcessor = new CommentProcessor(trainingData, "resolved", "unresolved");
-            String classification = commentProcessor.classifyData(trainingData, lastestComment);
+            // CommentProcessor commentProcessor = new CommentProcessor(trainingData,
+            // "resolved", "unresolved");
+            // String classification = commentProcessor.classifyData(trainingData,
+            // lastestComment);
+
+            MyFilteredLearner learner = new MyFilteredLearner();
+			learner.loadDataset("trainingData.arff");
+			// Evaluation mus be done before training
+			// More info in: http://weka.wikispaces.com/Use+WEKA+in+your+Java+code
+			learner.evaluate();
+            learner.learn();
+            learner.saveModel("trainingDataModel.arff");
+            MyFilteredClassifier classifier = new MyFilteredClassifier();
+            classifier.load("trainingData.arff");
+            classifier.loadModel("trainingDataModel.arff");
+            classifier.makeInstance(lastestComment, "resolved", "unresolved");
+            String classification = classifier.classify();
+	// 		classifier.loadModel(args[1]);
+	// 		classifier.makeInstance();
+	// 		classifier.classify();
+
+
             // System.out.println("classification " + classification);
 
             processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue),
                     classification);
             // TODO delete these two following lines once have more data to get classifer to
             // work correctly
-         //   processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue), "resolved");
-         //   processorDB.putClassificationInDB(currentIssue.getUrl(), IssueUtils.getSqlDate(currentIssue), "unresolved");
+            // processorDB.putClassificationInDB(currentIssue.getUrl(),
+            // IssueUtils.getSqlDate(currentIssue), "resolved");
+            // processorDB.putClassificationInDB(currentIssue.getUrl(),
+            // IssueUtils.getSqlDate(currentIssue), "unresolved");
 
         }
 
