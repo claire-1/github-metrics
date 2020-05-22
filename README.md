@@ -1,4 +1,4 @@
-# Github Metrics: The Classification of Github Issues as Resolved or Closed
+# Github Metrics: The Classification of Github Issues as Resolved or Unresolved Using Naive Bayes
 I wrote a blog post about this project [here](https://dev.to/claire1/ai-github-api-issue-sentiment-classification-4913)!
 
 I created this project for a Software Engineering class I took.
