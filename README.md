@@ -54,7 +54,6 @@ To show that my classifier worked for data classification in general, I found a 
 In the future, it might be helpful to explore links to related pull requests mentioned in issues since they often give a good suggestion as to whether or not an issue was resolved.
 
 ## Sources
-### Helpful Sources
 Java Github API: https://github.com/github-api/github-api \
 Source for bubble chart: https://www.freecodecamp.org/news/a-gentle-introduction-to-d3-how-to-build-a-reusable-bubble-chart-9106dc4f6c46/ and https://github.com/dmesquita/reusable_bubble_chart \
 Source for working classification: based on this tutorial http://jmgomezhidalgo.blogspot.com/2013/04/a-simple-text-classifier-in-java-with.html with this repo https://github.com/jmgomezh/tmweka/tree/master/FilteredClassifier \
